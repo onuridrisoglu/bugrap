@@ -4,11 +4,16 @@ import org.vaadin.bugrap.domain.BugrapRepository;
 
 public class DatabaseHelper {
 	
-	public static final String DB_LOCATION = "/Users/onuridrisoglu/Development/eclipse-workspace/bugrap-data/bugrap";
+	public static final String DB_LOCATION = "/Users/onuridrisoglu/Development/eclipse-workspace/bugrap-datatest/bugrap";
 	
-	public static void main(String[] args) {
-		BugrapRepository repository = new BugrapRepository(DB_LOCATION);
-		repository.populateWithTestData();
-		
+	/**
+	 * Checks whether the DB is empty or not
+	 * @param repository
+	 * @return true if DB was empty but initialized
+	 */
+	public static boolean initializeIfEmpty(BugrapRepository repository) {
+		if (repository.findReporters().size() > 0)
+			return false;
+		return repository.populateWithTestData();
 	}
 }

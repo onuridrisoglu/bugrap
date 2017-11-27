@@ -1,6 +1,7 @@
 package org.vaadin.bugrap.ui;
 
 import org.vaadin.bugrap.BaseModel;
+import org.vaadin.bugrap.DatabaseHelper;
 import org.vaadin.bugrap.domain.entities.Reporter;
 
 import com.vaadin.ui.Notification;
@@ -10,10 +11,16 @@ public class LoginModel extends BaseModel{
 
 	public void login(String un, String pw) {
 		Reporter reporter = getRepository().authenticate(un, pw);
-		if (reporter != null)
+		if (reporter == null && DatabaseHelper.initializeIfEmpty(getRepository())) {
+			System.out.println("Database was empty, but initialized. Reautenticating...");
+			reporter = getRepository().authenticate(un, pw);
+		}
+		
+		if (reporter != null) {
 			Notification.show("Welcome "+reporter.getName(), Type.TRAY_NOTIFICATION);
-		else
+		}else {
 			Notification.show("Please check your credentials", Type.WARNING_MESSAGE);
+		}
 	}
 	
 }
