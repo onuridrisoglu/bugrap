@@ -23,20 +23,20 @@ import com.vaadin.ui.UI;
  */
 @Theme("valo")
 public class BugrapUI extends UI {
-    @Override
-    protected void init(VaadinRequest vaadinRequest) {
-    	
-    		Navigator navigator = new Navigator(this,  this);
-    		
-        final LoginView loginView = new LoginView();
-        loginView.setModel(new LoginModel(navigator));
-        navigator.addView(BaseModel.NAV_LOGIN, loginView);
-    	
-    		final ReportsView reportsView = new ReportsView();
-    		reportsView.setModel(new ReportsModel(navigator));
-    		navigator.addView(BaseModel.NAV_REPORT, reportsView);
-    		navigator.navigateTo(BaseModel.NAV_LOGIN);
-    }
+    
+	@Override
+	protected void init(VaadinRequest vaadinRequest) {
+		Navigator navigator = new Navigator(this, this);
+
+		final LoginView loginView = new LoginView();
+		loginView.setModel(new LoginModel(navigator));
+		navigator.addView(BaseModel.NAV_LOGIN, loginView);
+
+		final ReportsView reportsView = new ReportsView();
+		reportsView.setModel(new ReportsModel(navigator));
+		navigator.addView(BaseModel.NAV_REPORT, reportsView);
+		navigator.navigateTo(BaseModel.NAV_LOGIN);
+	}
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = BugrapUI.class, productionMode = false)
