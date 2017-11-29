@@ -7,18 +7,18 @@
 <application generated-by="eclipse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://update.zeroturnaround.com/jrebel/rebel-2_1.xsd">
 
 	<classpath>
-		<dir name="/Users/onuridrisoglu/Development/eclipse-workspace/bugrap/target/classes">
+		<dir name="/Users/onuridrisoglu/git/bugrap/bugrap/target">
 		</dir>
 	</classpath>
 
 	<web>
 		<link target="/">
-			<dir name="/Users/onuridrisoglu/Development/eclipse-workspace/bugrap/target/m2e-wtp/web-resources">
+			<dir name="/Users/onuridrisoglu/git/bugrap/bugrap/target/m2e-wtp/web-resources">
 				<exclude name="/"/>
 			</dir>
 		</link>
 		<link target="/">
-			<dir name="/Users/onuridrisoglu/Development/eclipse-workspace/bugrap/src/main/webapp">
+			<dir name="/Users/onuridrisoglu/git/bugrap/bugrap/src/main/webapp">
 			</dir>
 		</link>
 	</web>

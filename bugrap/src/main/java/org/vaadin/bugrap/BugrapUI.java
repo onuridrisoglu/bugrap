@@ -1,5 +1,6 @@
 package org.vaadin.bugrap;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.bugrap.ui.LoginModel;
@@ -38,8 +39,18 @@ public class BugrapUI extends UI {
 		navigator.navigateTo(BaseModel.NAV_LOGIN);
 	}
 
-    @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
+    @WebServlet(urlPatterns = "/*", name = "BugrapUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = BugrapUI.class, productionMode = false)
-    public static class MyUIServlet extends VaadinServlet {
+    public static class BugrapUIServlet extends VaadinServlet {
+    	
+    		@Override
+    		protected void servletInitialized() throws ServletException {
+    			super.servletInitialized();
+    			if (DatabaseHelper.initializeIfEmpty(BaseModel.getRepository())) {
+    				System.out.println("Database was empty, but initialized. Reautenticating...");
+    			}else {
+    				System.out.println("Database is already initialized.");
+    			}
+    		}
     }
 }
