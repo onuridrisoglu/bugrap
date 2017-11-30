@@ -15,7 +15,7 @@ public class LoginModel extends BaseModel{
 	}
 	
 	public boolean login(String un, String pw) {
-		Reporter reporter = getRepository().authenticate(un, pw);
+		Reporter reporter = loginUser != null ? loginUser : getRepository().authenticate(un, pw);
 		if (reporter != null) {
 			loginUser = reporter;
 			getNavigator().navigateTo(NAV_REPORT);

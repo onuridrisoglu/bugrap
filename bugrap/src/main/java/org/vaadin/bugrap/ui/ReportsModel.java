@@ -2,6 +2,7 @@ package org.vaadin.bugrap.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,6 @@ public class ReportsModel extends BaseModel{
 		List<Project> projects = new ArrayList<Project>();
 		projects.addAll(getRepository().findProjects());
 		Collections.sort(projects);
-				
 		combo.setItems(projects);
 		combo.setSelectedItem(projects.get(0));
 	}

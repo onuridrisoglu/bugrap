@@ -1,5 +1,6 @@
 package org.vaadin.bugrap.ui;
 
+import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.ui.generated.LoginViewBase;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -18,6 +19,8 @@ public class LoginView extends LoginViewBase implements View{
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		if (BaseModel.loginUser != null)
+			model.login(username.getValue(), password.getValue());
 		clearFields();
 	}
 	
