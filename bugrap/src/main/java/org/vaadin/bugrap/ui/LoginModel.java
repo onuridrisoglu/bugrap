@@ -14,19 +14,15 @@ public class LoginModel extends BaseModel{
 		super(navigator);
 	}
 	
-	public void login(String un, String pw) {
+	public boolean login(String un, String pw) {
 		Reporter reporter = getRepository().authenticate(un, pw);
-		if (reporter == null && DatabaseHelper.initializeIfEmpty(getRepository())) {
-			System.out.println("Database was empty, but initialized. Reautenticating...");
-			reporter = getRepository().authenticate(un, pw);
-		}
-		
 		if (reporter != null) {
 			loginUser = reporter;
 			getNavigator().navigateTo(NAV_REPORT);
-		}else {
-			Notification.show("Please check your credentials", Type.WARNING_MESSAGE);
+			return true;
 		}
+		
+		return false;
 	}
 	
 }

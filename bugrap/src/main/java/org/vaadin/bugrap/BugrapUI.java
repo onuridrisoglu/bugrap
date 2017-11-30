@@ -1,5 +1,6 @@
 package org.vaadin.bugrap;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.bugrap.ui.LoginModel;
@@ -23,23 +24,33 @@ import com.vaadin.ui.UI;
  */
 @Theme("valo")
 public class BugrapUI extends UI {
-    @Override
-    protected void init(VaadinRequest vaadinRequest) {
-    	
-    		Navigator navigator = new Navigator(this,  this);
-    		
-        final LoginView loginView = new LoginView();
-        loginView.setModel(new LoginModel(navigator));
-        navigator.addView(BaseModel.NAV_LOGIN, loginView);
-    	
-    		final ReportsView reportsView = new ReportsView();
-    		reportsView.setModel(new ReportsModel(navigator));
-    		navigator.addView(BaseModel.NAV_REPORT, reportsView);
-    		navigator.navigateTo(BaseModel.NAV_LOGIN);
-    }
+    
+	@Override
+	protected void init(VaadinRequest vaadinRequest) {
+		Navigator navigator = new Navigator(this, this);
 
-    @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
+		final LoginView loginView = new LoginView();
+		loginView.setModel(new LoginModel(navigator));
+		navigator.addView(BaseModel.NAV_LOGIN, loginView);
+
+		final ReportsView reportsView = new ReportsView();
+		reportsView.setModel(new ReportsModel(navigator));
+		navigator.addView(BaseModel.NAV_REPORT, reportsView);
+		navigator.navigateTo(BaseModel.NAV_LOGIN);
+	}
+
+    @WebServlet(urlPatterns = "/*", name = "BugrapUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = BugrapUI.class, productionMode = false)
-    public static class MyUIServlet extends VaadinServlet {
+    public static class BugrapUIServlet extends VaadinServlet {
+    	
+    		@Override
+    		protected void servletInitialized() throws ServletException {
+    			super.servletInitialized();
+    			if (DatabaseHelper.initializeIfEmpty(BaseModel.getRepository())) {
+    				System.out.println("Database was empty, but initialized. Reautenticating...");
+    			}else {
+    				System.out.println("Database is already initialized.");
+    			}
+    		}
     }
 }
