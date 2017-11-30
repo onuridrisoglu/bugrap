@@ -1,5 +1,7 @@
 package org.vaadin.bugrap;
 
+import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
@@ -24,7 +26,7 @@ import com.vaadin.ui.UI;
  */
 @Theme("valo")
 public class BugrapUI extends UI {
-    
+    private static Logger logger = Logger.getLogger(BugrapUI.class.getName());
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
 		Navigator navigator = new Navigator(this, this);
@@ -47,9 +49,9 @@ public class BugrapUI extends UI {
     		protected void servletInitialized() throws ServletException {
     			super.servletInitialized();
     			if (DatabaseHelper.initializeIfEmpty(BaseModel.getRepository())) {
-    				System.out.println("Database was empty, but initialized. Reautenticating...");
+    				logger.info("Database was empty, but initialized. Reautenticating...");
     			}else {
-    				System.out.println("Database is already initialized.");
+    				logger.fine("Database is already initialized.");
     			}
     		}
     }
