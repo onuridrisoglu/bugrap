@@ -1,12 +1,18 @@
 package org.vaadin.bugrap;
 
+import java.util.logging.Logger;
+
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.bugrap.ui.LoginModel;
 import org.vaadin.bugrap.ui.LoginView;
+import org.vaadin.bugrap.ui.ReportsModel;
+import org.vaadin.bugrap.ui.ReportsView;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
@@ -20,16 +26,33 @@ import com.vaadin.ui.UI;
  */
 @Theme("valo")
 public class BugrapUI extends UI {
+    private static Logger logger = Logger.getLogger(BugrapUI.class.getName());
+	@Override
+	protected void init(VaadinRequest vaadinRequest) {
+		Navigator navigator = new Navigator(this, this);
 
-    @Override
-    protected void init(VaadinRequest vaadinRequest) {
-        final LoginView loginView = new LoginView();
-        loginView.setModel(new LoginModel());
-        setContent(loginView);
-    }
+		final LoginView loginView = new LoginView();
+		loginView.setModel(new LoginModel(navigator));
+		navigator.addView(BaseModel.NAV_LOGIN, loginView);
 
-    @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
+		final ReportsView reportsView = new ReportsView();
+		reportsView.setModel(new ReportsModel(navigator));
+		navigator.addView(BaseModel.NAV_REPORT, reportsView);
+		navigator.navigateTo(BaseModel.NAV_LOGIN);
+	}
+
+    @WebServlet(urlPatterns = "/*", name = "BugrapUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = BugrapUI.class, productionMode = false)
-    public static class MyUIServlet extends VaadinServlet {
+    public static class BugrapUIServlet extends VaadinServlet {
+    	
+    		@Override
+    		protected void servletInitialized() throws ServletException {
+    			super.servletInitialized();
+    			if (DatabaseHelper.initializeIfEmpty(BaseModel.getRepository())) {
+    				logger.info("Database was empty, but initialized. Reautenticating...");
+    			}else {
+    				logger.fine("Database is already initialized.");
+    			}
+    		}
     }
 }
