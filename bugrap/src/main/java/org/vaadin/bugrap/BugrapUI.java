@@ -31,12 +31,10 @@ public class BugrapUI extends UI {
 	protected void init(VaadinRequest vaadinRequest) {
 		Navigator navigator = new Navigator(this, this);
 
-		final LoginView loginView = new LoginView();
-		loginView.setModel(new LoginModel(navigator));
+		final LoginView loginView = new LoginView(new LoginModel(navigator));
 		navigator.addView(BaseModel.NAV_LOGIN, loginView);
 
-		final ReportsView reportsView = new ReportsView();
-		reportsView.setModel(new ReportsModel(navigator));
+		final ReportsView reportsView = new ReportsView(new ReportsModel(navigator));
 		navigator.addView(BaseModel.NAV_REPORT, reportsView);
 		navigator.navigateTo(BaseModel.NAV_LOGIN);
 	}

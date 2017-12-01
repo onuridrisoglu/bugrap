@@ -7,78 +7,81 @@
   <meta name="package-mapping" content="org_vaadin_peter_buttongroup:org.vaadin.peter.buttongroup">
  </head>
  <body>
-  <vaadin-vertical-layout icon="fonticon://Vaadin-Icons/e684">
-   <vaadin-horizontal-layout width-full>
-    <vaadin-combo-box empty-selection-allowed="false" style-name="borderless" width-full data-item-type="org.vaadin.bugrap.domain.entities.Project" data-property-id="name" _id="cmbProjectFilter"></vaadin-combo-box>
-    <vaadin-css-layout style-name="v-component-group" :right>
-     <vaadin-button icon="fonticon://Vaadin-Icons/e80d" style-name="quiet small" plain-text _id="btnUser">
-       User 
-     </vaadin-button>
-     <vaadin-button icon="fonticon://Vaadin-Icons/e6ac" style-name="quiet small" plain-text _id="btnLogout">
-       Logout 
-     </vaadin-button>
-    </vaadin-css-layout>
-   </vaadin-horizontal-layout>
-   <vaadin-horizontal-layout width-full>
-    <vaadin-css-layout>
-     <vaadin-button icon="fonticon://Vaadin-Icons/e68b" style-name="quiet small" plain-text _id="btnCreateBug">
-       Report a bug 
-     </vaadin-button>
-     <vaadin-button icon="fonticon://Vaadin-Icons/e6ae" style-name="quiet small" plain-text _id="btnRequestFeature">
-       Request a feature 
-     </vaadin-button>
-     <vaadin-button icon="fonticon://Vaadin-Icons/e686" style-name="quiet small" plain-text icon-alt="sss" _id="btnManageProject">
-       Manage project 
-     </vaadin-button>
-    </vaadin-css-layout>
-    <vaadin-text-field icon="fonticon://Vaadin-Icons/e805" style-name="small inline-icon" placeholder="Search reports..." width-full _id="txtReportFilter" :middle :right></vaadin-text-field>
-   </vaadin-horizontal-layout>
-   <vaadin-horizontal-layout width-full>
-    <vaadin-form-layout size-auto margin="false">
-     <vaadin-combo-box caption="Reports for" empty-selection-allowed="false" style-name="borderless small" data-item-type="org.vaadin.bugrap.domain.entities.ProjectVersion" data-property-id="version" _id="cmbVersion"></vaadin-combo-box>
-    </vaadin-form-layout>
-   </vaadin-horizontal-layout>
-   <vaadin-horizontal-layout width-full>
-    <vaadin-grid width-full data-item-type="org.vaadin.bugrap.domain.entities.Report" _id="gridReports">
-     <table>
-      <colgroup>
-       <col column-id="type" sortable>
-       <col column-id="summary" sortable>
-       <col column-id="description" sortable>
-       <col column-id="project" sortable>
-       <col column-id="version" sortable>
-       <col column-id="priority" sortable>
-       <col column-id="assigned" sortable>
-       <col column-id="status" sortable>
-       <col column-id="occursIn" sortable>
-       <col column-id="timestamp" sortable>
-       <col column-id="reportedTimestamp" sortable>
-       <col column-id="author" sortable>
-       <col column-id="consistencyVersion" sortable>
-       <col column-id="id" sortable>
-      </colgroup>
-      <thead>
-       <tr default>
-        <th plain-text column-ids="type">Type</th>
-        <th plain-text column-ids="summary">Summary</th>
-        <th plain-text column-ids="description">Description</th>
-        <th plain-text column-ids="project">Project</th>
-        <th plain-text column-ids="version">Version</th>
-        <th plain-text column-ids="priority">Priority</th>
-        <th plain-text column-ids="assigned">Assigned</th>
-        <th plain-text column-ids="status">Status</th>
-        <th plain-text column-ids="occursIn">OccursIn</th>
-        <th plain-text column-ids="timestamp">Timestamp</th>
-        <th plain-text column-ids="reportedTimestamp">ReportedTimestamp</th>
-        <th plain-text column-ids="author">Author</th>
-        <th plain-text column-ids="consistencyVersion">ConsistencyVersion</th>
-        <th plain-text column-ids="id">Id</th>
-       </tr>
-      </thead>
-      <tbody></tbody>
-     </table>
-    </vaadin-grid>
-   </vaadin-horizontal-layout>
-  </vaadin-vertical-layout>
+  <vaadin-horizontal-layout size-full>
+   <vaadin-vertical-split-panel id="vsplit" split-position="55%" _id="vsplit">
+    <vaadin-vertical-layout>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-combo-box empty-selection-allowed="false" style-name="borderless" width-full data-item-type="org.vaadin.bugrap.domain.entities.Project" data-property-id="name" _id="cmbProjectFilter"></vaadin-combo-box>
+      <vaadin-css-layout style-name="v-component-group" :right>
+       <vaadin-button icon="fonticon://Vaadin-Icons/e80d" style-name="quiet small" plain-text _id="btnUser">
+         User 
+       </vaadin-button>
+       <vaadin-button icon="fonticon://Vaadin-Icons/e6ac" style-name="quiet small" plain-text _id="btnLogout">
+         Logout 
+       </vaadin-button>
+      </vaadin-css-layout>
+     </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-css-layout>
+       <vaadin-button icon="fonticon://Vaadin-Icons/e68b" style-name="quiet small" plain-text _id="btnCreateBug">
+         Report a bug 
+       </vaadin-button>
+       <vaadin-button icon="fonticon://Vaadin-Icons/e6ae" style-name="quiet small" plain-text _id="btnRequestFeature">
+         Request a feature 
+       </vaadin-button>
+       <vaadin-button icon="fonticon://Vaadin-Icons/e686" style-name="quiet small" plain-text icon-alt="sss" _id="btnManageProject">
+         Manage project 
+       </vaadin-button>
+      </vaadin-css-layout>
+      <vaadin-text-field icon="fonticon://Vaadin-Icons/e805" style-name="small inline-icon" placeholder="Search reports..." width-full _id="txtReportFilter" :middle :right></vaadin-text-field>
+     </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-form-layout size-auto margin="false">
+       <vaadin-combo-box caption="Reports for" empty-selection-allowed="false" style-name="borderless small" data-item-type="org.vaadin.bugrap.domain.entities.ProjectVersion" data-property-id="version" _id="cmbVersion"></vaadin-combo-box>
+      </vaadin-form-layout>
+     </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout size-full>
+      <vaadin-grid size-full data-item-type="org.vaadin.bugrap.domain.entities.Report" _id="gridReports">
+       <table>
+        <colgroup>
+         <col column-id="type" sortable>
+         <col column-id="summary" sortable>
+         <col column-id="description" sortable>
+        </colgroup>
+        <thead>
+         <tr default>
+          <th plain-text column-ids="type">Type</th>
+          <th plain-text column-ids="summary">Summary</th>
+          <th plain-text column-ids="description">Description</th>
+         </tr>
+        </thead>
+        <tbody></tbody>
+       </table>
+      </vaadin-grid>
+     </vaadin-horizontal-layout>
+    </vaadin-vertical-layout>
+    <vaadin-vertical-layout>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-button icon="fonticon://Vaadin-Icons/e7de" style-name="borderless small" plain-text _id="btnReportSummary">
+        Menubar "bottleneck" usability problem 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-combo-box caption="PRIORITY" style-name="small" data-item-type="org.vaadin.bugrap.domain.entities.Report.Priority" _id="cmbEditPriority"></vaadin-combo-box>
+      <vaadin-combo-box caption="TYPE" style-name="small" data-item-type="org.vaadin.bugrap.domain.entities.Report.Type" _id="cmbEditType"></vaadin-combo-box>
+      <vaadin-combo-box caption="STATUS" style-name="small" data-item-type="org.vaadin.bugrap.domain.entities.Report.Status" _id="cmbEditStatus"></vaadin-combo-box>
+      <vaadin-combo-box caption="ASSIGNED TO" style-name="small" data-item-type="org.vaadin.bugrap.domain.entities.Reporter" _id="cmbEditAssignedTo"></vaadin-combo-box>
+      <vaadin-combo-box caption="VERSION" style-name="small" data-item-type="org.vaadin.bugrap.domain.entities.ProjectVersion" _id="cmbEditVersion"></vaadin-combo-box>
+      <vaadin-button style-name="small" plain-text _id="btnUpdateReport" :bottom :right>
+        Update 
+      </vaadin-button>
+      <vaadin-button style-name="small" plain-text _id="btnRevertReport" :bottom>
+        Revert 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
+     <vaadin-text-area rows="10" style-name="small" size-full _id="txtReportDescription"></vaadin-text-area>
+    </vaadin-vertical-layout>
+   </vaadin-vertical-split-panel>
+  </vaadin-horizontal-layout>
  </body>
 </html>

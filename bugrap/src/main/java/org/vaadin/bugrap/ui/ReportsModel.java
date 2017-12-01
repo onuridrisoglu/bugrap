@@ -2,7 +2,6 @@ package org.vaadin.bugrap.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +10,12 @@ import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.domain.entities.Report.Priority;
+import org.vaadin.bugrap.domain.entities.Report.Status;
+import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
+import org.vaadin.bugrap.ui.columns.CamelcaseTextRenderer;
+import org.vaadin.bugrap.util.StringUtil;
 
 import com.vaadin.data.Binder;
 import com.vaadin.navigator.Navigator;
@@ -22,9 +26,14 @@ public class ReportsModel extends BaseModel{
 
 	private Project selectedProject;
 	private ProjectVersion selectedVersion;
+	private Binder<Report> reportBinder = new Binder<Report>();
 	
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
+	}
+	
+	public Binder<Report> getBinder(){
+		return reportBinder;
 	}
 	
 	
@@ -35,14 +44,35 @@ public class ReportsModel extends BaseModel{
 		combo.setItems(projects);
 		combo.setSelectedItem(projects.get(0));
 	}
+	
+	public void fillPriorties(ComboBox<Priority> combo) {
+		combo.setItems(Priority.values());
+	}
+	
+	public void fillTypes(ComboBox<Type> combo) {
+		combo.setItems(Type.values());
+		combo.setItemCaptionGenerator(type -> StringUtil.converToCamelCaseString(type.toString()));
+	}
+	
+	public void fillStatuses(ComboBox<Status> combo) {
+		combo.setItems(Status.values());
+	}
 
-	public void processProjectChange(Optional<Project> selectedItem, ComboBox<ProjectVersion> cmbVersion) {
+	public void fillAssigned(ComboBox<Reporter> combo) {
+//		List<Reporter> reporters = new ArrayList<Reporter>();
+//		reporters.addAll();
+//		Collections.sort(reporters);
+		combo.setItems(getRepository().findReporters());
+	}
+	
+	public void processProjectChange(Optional<Project> selectedItem, ComboBox<ProjectVersion> cmbVersion, ComboBox<ProjectVersion> cmbVersionEdit) {
 		selectedProject = selectedItem.get();
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(selectedProject));
 		Collections.sort(projectVersions);
 		
 		cmbVersion.setItems(projectVersions);
+		cmbVersionEdit.setItems(projectVersions);
 		cmbVersion.setSelectedItem(projectVersions.get(0));
 	}
 
@@ -57,5 +87,9 @@ public class ReportsModel extends BaseModel{
 		reports.addAll(getRepository().findReports(query));
 		gridReports.setItems(reports);
 	}
+
+
+
+
 
 }
