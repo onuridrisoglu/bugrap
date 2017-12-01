@@ -14,6 +14,4 @@ public class CamelcaseTextRenderer extends TextRenderer {
 			value = getNullRepresentation();
 		return super.encode(StringUtil.converToCamelCaseString(value.toString()));
 	}
-
-	
 }
