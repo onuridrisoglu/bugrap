@@ -1,21 +1,30 @@
 package org.vaadin.bugrap.ui;
 
+import java.util.Set;
+
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.entities.Report;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
 import org.vaadin.bugrap.ui.generated.ReportsViewBase;
+import org.vaadin.bugrap.util.ReportUtil;
 import org.vaadin.bugrap.util.StringUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
 public class ReportsView extends ReportsViewBase implements View{
 
+	public static final int SLIDER_NOSELECTION		= 100;
+	public static final int SLIDER_SINGLESELECTION	= 52;
+	public static final int SLIDER_MULTISELECTION	= 78;
+	
 	private ReportsModel model;
+	
 	
 	public ReportsView(ReportsModel m) {
 		super();
@@ -51,16 +60,18 @@ public class ReportsView extends ReportsViewBase implements View{
 		gridReports.addColumn("timestamp", new FineDateRenderer()).setCaption("LAST MODIFIED").setExpandRatio(2);
 		gridReports.addColumn("reportedTimestamp", new FineDateRenderer()).setCaption("REPORTED").setExpandRatio(2);
 		
-//		gridReports.setColumns("priority", "type", "summary", "assigned", "timestamp", "reportedTimestamp");
-		
 		cmbProjectFilter.addSelectionListener(evt -> model.processProjectChange(cmbProjectFilter.getSelectedItem(), cmbVersion, cmbEditVersion));
 		cmbVersion.addSelectionListener(evt -> model.processVersionChange(cmbVersion.getSelectedItem(), gridReports));
 		btnUpdateReport.addClickListener(evt -> saveReport());
-		btnRevertReport.addClickListener(evt -> model.revertChanges());
+		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
-		gridReports.addSelectionListener(evt -> displaySelectedReport(evt));
+		gridReports.addSelectionListener(evt -> onReportSelected(evt));
 	}
 	
+
+	private void revertChanges() {
+		model.revertChanges(gridReports.getSelectedItems());
+	}
 
 	private void initializeBinder() {
 		model.getBinder().bind(cmbEditPriority, Report::getPriority, Report::setPriority);
@@ -71,22 +82,44 @@ public class ReportsView extends ReportsViewBase implements View{
 		model.getBinder().bind(txtReportDescription, Report::getDescription, Report::setDescription);
 	}
 
-	private void displaySelectedReport(SelectionEvent<Report> evt) {
-		float position = 100;
-		if (evt.getFirstSelectedItem().isPresent()) {
-			Report selectedReport = evt.getFirstSelectedItem().get();
-			model.getBinder().setBean(selectedReport);
-			btnReportSummary.setCaption(selectedReport.getSummary());
-			position = 55;
+	private void onReportSelected(SelectionEvent<Report> evt) {
+		int selectedItemCount = evt.getAllSelectedItems().size();
+		if (selectedItemCount == 0) {
+			vsplit.setSplitPosition(SLIDER_NOSELECTION);
+		}else {
+			if (selectedItemCount == 1) {
+				processSingleSelection(evt.getFirstSelectedItem().get());
+				vsplit.setSplitPosition(SLIDER_SINGLESELECTION);
+			} else if (selectedItemCount > 1) {
+				processMultiSelection(evt.getAllSelectedItems());
+				vsplit.setSplitPosition(SLIDER_MULTISELECTION);
+			} 
 		}
-		vsplit.setSplitPosition(position);
+	}
+
+	private void processSingleSelection(Report selectedReport) {
+		model.getBinder().setBean(selectedReport);
+		btnReportSummary.setCaption(selectedReport.getSummary());
+		btnReportSummary.setVisible(true);
+		txtReportDescription.setVisible(true);
+		lblMultiReportInfo.setVisible(false);
+		
 	}
 	
+	private void processMultiSelection(Set<Report> selectedReports) {
+		Report commonFields = ReportUtil.getCommonFields(selectedReports);
+		model.getBinder().setBean(commonFields);
+		lblMultiReportInfo.setValue(commonFields.getSummary());
+		txtReportDescription.setVisible(false);
+		lblMultiReportInfo.setVisible(true);
+		btnReportSummary.setVisible(false);
+	}
+
 	private void saveReport() {
-		Report report;
 		try {
-			report = model.updateReport();
-			Notification.show("Report["+report.getSummary()+"] is saved", Type.TRAY_NOTIFICATION);
+			boolean isBulkMode = gridReports.getSelectedItems().size() > 1;
+			model.updateReport(gridReports.getSelectedItems());
+			Notification.show("Report"+(isBulkMode ? "s are" : " is") +" saved", Type.TRAY_NOTIFICATION);
 			model.processVersionChange(cmbVersion.getSelectedItem(), gridReports);
 		} catch (ValidationException e) {
 			Notification.show("Missing information, "+e.getMessage(), Type.ERROR_MESSAGE);

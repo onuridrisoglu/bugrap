@@ -8,7 +8,7 @@
  </head>
  <body>
   <vaadin-horizontal-layout size-full>
-   <vaadin-vertical-split-panel id="vsplit" split-position="55%" _id="vsplit">
+   <vaadin-vertical-split-panel id="vsplit" split-position="100%" _id="vsplit">
     <vaadin-vertical-layout>
      <vaadin-horizontal-layout width-full>
       <vaadin-combo-box empty-selection-allowed="false" style-name="borderless" width-full data-item-type="org.vaadin.bugrap.domain.entities.Project" data-property-id="name" _id="cmbProjectFilter"></vaadin-combo-box>
@@ -41,7 +41,7 @@
       </vaadin-form-layout>
      </vaadin-horizontal-layout>
      <vaadin-horizontal-layout size-full>
-      <vaadin-grid size-full data-item-type="org.vaadin.bugrap.domain.entities.Report" _id="gridReports">
+      <vaadin-grid size-full data-item-type="org.vaadin.bugrap.domain.entities.Report" selection-mode="multi" _id="gridReports">
        <table>
         <colgroup>
          <col column-id="type" sortable>
@@ -65,6 +65,9 @@
       <vaadin-button icon="fonticon://Vaadin-Icons/e7de" style-name="borderless small" plain-text _id="btnReportSummary">
         Menubar "bottleneck" usability problem 
       </vaadin-button>
+      <vaadin-label visible="false" _id="lblMultiReportInfo">
+        Label 
+      </vaadin-label>
      </vaadin-horizontal-layout>
      <vaadin-horizontal-layout width-full>
       <vaadin-combo-box caption="PRIORITY" empty-selection-allowed="false" style-name="tiny" width="160px" data-item-type="org.vaadin.bugrap.domain.entities.Report.Priority" _id="cmbEditPriority"></vaadin-combo-box>

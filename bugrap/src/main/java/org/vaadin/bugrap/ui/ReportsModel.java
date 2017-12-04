@@ -2,6 +2,7 @@ package org.vaadin.bugrap.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
 import org.vaadin.bugrap.ui.columns.CamelcaseTextRenderer;
+import org.vaadin.bugrap.util.ReportUtil;
 import org.vaadin.bugrap.util.StringUtil;
 
 import com.vaadin.data.Binder;
@@ -101,15 +103,30 @@ public class ReportsModel extends BaseModel{
 			}
 	}
 
-	public Report updateReport() throws ValidationException {
-		Report report =	 getRepository().save(reportBinder.getBean());
-		return report;
+	public void updateReport(Set<Report> reportsToUpdate) throws ValidationException {
+		boolean isBulkMode = reportsToUpdate.size() > 1;
+		for (Report report : reportsToUpdate) {
+			if(isBulkMode)
+				ReportUtil.setCommonFields(report, reportBinder.getBean());
+			getRepository().save(report);
+		}
 	}
 
-	public void revertChanges() {
-		Report report = reportBinder.getBean();
-		report = getRepository().getReportById(report.getId());
+	public void revertChanges(Set<Report> selectedReports) {
+		boolean isBulkMode = selectedReports.size() > 1;
+		List<Report> originalReports = new ArrayList<Report>();
+		for (Report report : selectedReports) {
+			originalReports.add(getRepository().getReportById(report.getId()));
+		}
+		Report report = isBulkMode ? ReportUtil.getCommonFields(originalReports) : originalReports.get(0);
 		reportBinder.setBean(report);
+	}
+
+	public void bulkSaveWithCommonFields(Set<Report> selectedReports, Report commonFields) {
+		for (Report report : selectedReports) {
+			ReportUtil.setCommonFields(report, commonFields);
+			getRepository().save(report);
+		}
 	}
 
 
