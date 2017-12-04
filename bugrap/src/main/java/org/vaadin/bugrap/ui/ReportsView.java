@@ -2,14 +2,16 @@ package org.vaadin.bugrap.ui;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.entities.Report;
-import org.vaadin.bugrap.ui.columns.CamelcaseTextRenderer;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
 import org.vaadin.bugrap.ui.generated.ReportsViewBase;
 import org.vaadin.bugrap.util.StringUtil;
 
+import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 
 public class ReportsView extends ReportsViewBase implements View{
 
@@ -49,14 +51,17 @@ public class ReportsView extends ReportsViewBase implements View{
 		gridReports.addColumn("timestamp", new FineDateRenderer()).setCaption("LAST MODIFIED").setExpandRatio(2);
 		gridReports.addColumn("reportedTimestamp", new FineDateRenderer()).setCaption("REPORTED").setExpandRatio(2);
 		
-		gridReports.setColumns("priority", "type", "summary", "assigned", "timestamp", "reportedTimestamp");
+//		gridReports.setColumns("priority", "type", "summary", "assigned", "timestamp", "reportedTimestamp");
 		
 		cmbProjectFilter.addSelectionListener(evt -> model.processProjectChange(cmbProjectFilter.getSelectedItem(), cmbVersion, cmbEditVersion));
 		cmbVersion.addSelectionListener(evt -> model.processVersionChange(cmbVersion.getSelectedItem(), gridReports));
+		btnUpdateReport.addClickListener(evt -> saveReport());
+		btnRevertReport.addClickListener(evt -> model.revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> displaySelectedReport(evt));
 	}
 	
+
 	private void initializeBinder() {
 		model.getBinder().bind(cmbEditPriority, Report::getPriority, Report::setPriority);
 		model.getBinder().bind(cmbEditType, Report::getType, Report::setType);
@@ -70,11 +75,22 @@ public class ReportsView extends ReportsViewBase implements View{
 		float position = 100;
 		if (evt.getFirstSelectedItem().isPresent()) {
 			Report selectedReport = evt.getFirstSelectedItem().get();
-			model.getBinder().readBean(selectedReport);
+			model.getBinder().setBean(selectedReport);
 			btnReportSummary.setCaption(selectedReport.getSummary());
 			position = 55;
 		}
 		vsplit.setSplitPosition(position);
 	}
 	
+	private void saveReport() {
+		Report report;
+		try {
+			report = model.updateReport();
+			Notification.show("Report["+report.getSummary()+"] is saved", Type.TRAY_NOTIFICATION);
+			model.processVersionChange(cmbVersion.getSelectedItem(), gridReports);
+		} catch (ValidationException e) {
+			Notification.show("Missing information, "+e.getMessage(), Type.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+	}
 }

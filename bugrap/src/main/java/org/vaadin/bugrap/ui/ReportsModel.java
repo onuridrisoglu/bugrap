@@ -2,8 +2,10 @@ package org.vaadin.bugrap.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
@@ -18,6 +20,7 @@ import org.vaadin.bugrap.ui.columns.CamelcaseTextRenderer;
 import org.vaadin.bugrap.util.StringUtil;
 
 import com.vaadin.data.Binder;
+import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
@@ -77,6 +80,11 @@ public class ReportsModel extends BaseModel{
 	}
 
 	public void processVersionChange(Optional<ProjectVersion> selectedItem, Grid<Report> gridReports) {
+		boolean isVersionChanged = selectedVersion != selectedItem.get();
+		Set<Report> selectedReportsToRemember = null;
+		if (!isVersionChanged)
+			selectedReportsToRemember = gridReports.getSelectedItems();
+		
 		selectedVersion = selectedItem.get();
 		
 		ReportsQuery query = new ReportsQuery();
@@ -86,6 +94,22 @@ public class ReportsModel extends BaseModel{
 		List<Report> reports = new ArrayList<Report>();
 		reports.addAll(getRepository().findReports(query));
 		gridReports.setItems(reports);
+		
+		if (selectedReportsToRemember != null)
+			for (Report seletedReport : selectedReportsToRemember) {
+				gridReports.select(seletedReport);
+			}
+	}
+
+	public Report updateReport() throws ValidationException {
+		Report report =	 getRepository().save(reportBinder.getBean());
+		return report;
+	}
+
+	public void revertChanges() {
+		Report report = reportBinder.getBean();
+		report = getRepository().getReportById(report.getId());
+		reportBinder.setBean(report);
 	}
 
 

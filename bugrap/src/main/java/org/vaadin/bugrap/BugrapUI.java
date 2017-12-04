@@ -47,7 +47,7 @@ public class BugrapUI extends UI {
     		protected void servletInitialized() throws ServletException {
     			super.servletInitialized();
     			if (DatabaseHelper.initializeIfEmpty(BaseModel.getRepository())) {
-    				logger.info("Database was empty, but initialized. Reautenticating...");
+    				logger.info("Database was empty, but initialized.");
     			}else {
     				logger.fine("Database is already initialized.");
     			}
