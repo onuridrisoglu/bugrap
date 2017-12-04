@@ -4,7 +4,7 @@ import org.vaadin.bugrap.domain.BugrapRepository;
 
 public class DatabaseHelper {
 	
-	public static final String DB_LOCATION = "/Users/onuridrisoglu/Development/eclipse-workspace/bugrap-datatest/bugrap";
+	public static final String DB_LOCATION = "/Users/onuridrisoglu/Development/eclipse-workspace/bugrap-data/bugrap";
 	
 	/**
 	 * Checks whether the DB is empty or not
