@@ -27,21 +27,22 @@ public class FineDateRenderer extends DateRenderer{
 		Instant from = value.toInstant();
 		
 		if (ChronoUnit.DAYS.between(from, now) > 0) {
-			Period period = Period.between(LocalDate.ofInstant(from, ZoneOffset.UTC), LocalDate.ofInstant(now, ZoneOffset.UTC));
+			Period period = Period.between(LocalDate.ofInstant(from, ZoneOffset.UTC),
+					LocalDate.ofInstant(now, ZoneOffset.UTC));
 			if (period.getYears() > 0) {
 				durationAmount = period.getYears();
 				durationUnitTxt = "year";
-			}else if (period.getMonths() > 0) {
+			} else if (period.getMonths() > 0) {
 				durationAmount = period.getMonths();
 				durationUnitTxt = "month";
-			}else if (period.getDays() > 0) {
+			} else if (period.getDays() > 0) {
 				durationAmount = period.getDays();
 				durationUnitTxt = "day";
 			}
-		}else if (ChronoUnit.HOURS.between(from, now) > 0) {
+		} else if (ChronoUnit.HOURS.between(from, now) > 0) {
 			durationAmount = ChronoUnit.HOURS.between(from, now);
 			durationUnitTxt = "hour";
-		}else if (ChronoUnit.MINUTES.between(from, now) > 0) {
+		} else if (ChronoUnit.MINUTES.between(from, now) > 0) {
 			durationAmount = ChronoUnit.MINUTES.between(from, now);
 			durationUnitTxt = "minute";
 		}
