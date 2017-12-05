@@ -15,6 +15,7 @@ import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
+import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
@@ -60,16 +61,15 @@ public class ReportsModel extends BaseModel{
 		return getRepository().findReports(query);
 	}
 
-	public Report saveReport(Report report) throws ValidationException {
-		return getRepository().save(report);
+	public void saveReport(Collection<Report> selectedReports, Report changedCopy) throws ValidationException {
+		for (Report report : selectedReports) {
+			ReportUtil.setFields(report, changedCopy);
+			getRepository().save(report);
+		}
 	}
 
 	public Report getReportById(long reportId) {
 		return getRepository().getReportById(reportId);
 	}
-
-
-
-
 
 }
