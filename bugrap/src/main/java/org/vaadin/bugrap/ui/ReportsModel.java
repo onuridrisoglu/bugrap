@@ -1,61 +1,75 @@
 package org.vaadin.bugrap.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.domain.entities.Report.Priority;
+import org.vaadin.bugrap.domain.entities.Report.Status;
+import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
 
-import com.vaadin.data.Binder;
+import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Grid;
 
 public class ReportsModel extends BaseModel{
 
-	private Project selectedProject;
-	private ProjectVersion selectedVersion;
-	
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
 	}
 	
-	
-	public void fillProjects(ComboBox<Project> combo) {
+	public List<Project> findProjects() {
 		List<Project> projects = new ArrayList<Project>();
 		projects.addAll(getRepository().findProjects());
 		Collections.sort(projects);
-		combo.setItems(projects);
-		combo.setSelectedItem(projects.get(0));
+		return projects;
 	}
-
-	public void processProjectChange(Optional<Project> selectedItem, ComboBox<ProjectVersion> cmbVersion) {
-		selectedProject = selectedItem.get();
+	
+	public Collection<Priority> getPriorties() {
+		return Arrays.asList(Priority.values());
+	}
+	public Collection<Type> getTypes() {
+		return Arrays.asList(Type.values());
+	}
+	public Collection<Status> getStatuses() {
+		return Arrays.asList(Status.values());
+	}
+	
+	public Collection<Reporter> findReporters() {
+		return getRepository().findReporters();
+	}
+	
+	public List<ProjectVersion> findProjectVersions(Project selectedProject) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(selectedProject));
 		Collections.sort(projectVersions);
-		
-		cmbVersion.setItems(projectVersions);
-		cmbVersion.setSelectedItem(projectVersions.get(0));
+		return projectVersions;
+	}
+	
+	public Collection<Report> findReports(Project project, ProjectVersion version){
+		ReportsQuery query = new ReportsQuery();
+		query.project = project;
+		query.projectVersion = version;
+		return getRepository().findReports(query);
 	}
 
-	public void processVersionChange(Optional<ProjectVersion> selectedItem, Grid<Report> gridReports) {
-		selectedVersion = selectedItem.get();
-		
-		ReportsQuery query = new ReportsQuery();
-		query.project = selectedProject;
-		query.projectVersion = selectedVersion;
-		
-		List<Report> reports = new ArrayList<Report>();
-		reports.addAll(getRepository().findReports(query));
-		gridReports.setItems(reports);
+	public Report saveReport(Report report) throws ValidationException {
+		return getRepository().save(report);
 	}
+
+	public Report getReportById(long reportId) {
+		return getRepository().getReportById(reportId);
+	}
+
+
+
+
 
 }

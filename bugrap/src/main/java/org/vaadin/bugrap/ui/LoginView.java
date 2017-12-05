@@ -13,8 +13,12 @@ public class LoginView extends LoginViewBase implements View{
 	
 	private LoginModel model;
 	
-	public void setModel(LoginModel model) {
-		this.model = model;
+	public LoginView(LoginModel m) {
+		super();
+		model = m;
+		loginBtn.setClickShortcut(KeyCode.ENTER);
+		loginBtn.addClickListener(evt -> login());
+		clearBtn.addClickListener(evt -> clearFields());
 	}
 
 	@Override
@@ -22,13 +26,6 @@ public class LoginView extends LoginViewBase implements View{
 		if (BaseModel.loginUser != null)
 			model.login(username.getValue(), password.getValue());
 		clearFields();
-	}
-	
-	public LoginView() {
-		super();
-		loginBtn.setClickShortcut(KeyCode.ENTER);
-		loginBtn.addClickListener(evt -> login());
-		clearBtn.addClickListener(evt -> clearFields());
 	}
 	
 	private void clearFields() {
