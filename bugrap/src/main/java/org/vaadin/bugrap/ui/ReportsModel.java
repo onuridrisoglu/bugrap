@@ -72,4 +72,8 @@ public class ReportsModel extends BaseModel{
 		return getRepository().getReportById(reportId);
 	}
 
+	public void openReportDetail(long reportId) {
+		getNavigator().navigateTo(NAV_REPORTDET + "/reportId="+ reportId);
+	}
+
 }

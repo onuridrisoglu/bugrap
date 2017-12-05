@@ -5,8 +5,11 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
+import org.jsoup.Connection.Base;
 import org.vaadin.bugrap.ui.LoginModel;
 import org.vaadin.bugrap.ui.LoginView;
+import org.vaadin.bugrap.ui.ReportDetailModel;
+import org.vaadin.bugrap.ui.ReportDetailView;
 import org.vaadin.bugrap.ui.ReportsModel;
 import org.vaadin.bugrap.ui.ReportsView;
 
@@ -37,6 +40,11 @@ public class BugrapUI extends UI {
 		final ReportsView reportsView = new ReportsView(new ReportsModel(navigator));
 		navigator.addView(BaseModel.NAV_REPORT, reportsView);
 		navigator.navigateTo(BaseModel.NAV_LOGIN);
+		
+		final ReportDetailView detail = new ReportDetailView(new ReportDetailModel(navigator));
+		navigator.addView(BaseModel.NAV_REPORTDET, detail);
+		
+		navigator.navigateTo(BaseModel.NAV_LOGIN );
 	}
 
     @WebServlet(urlPatterns = "/*", name = "BugrapUIServlet", asyncSupported = true)

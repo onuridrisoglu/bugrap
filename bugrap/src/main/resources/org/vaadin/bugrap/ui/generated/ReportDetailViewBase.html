@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;GENERATE_GETTERS&quot;:false,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;mytheme&quot;}">
+  <meta name="vaadin-version" content="8.0.5">
+ </head>
+ <body>
+  <vaadin-vertical-layout>
+   <vaadin-horizontal-layout width-full>
+    <vaadin-label width-full plain-text _id="lblProjectVersionName" :expand>
+      &gt; 
+    </vaadin-label>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout spacing="false" width-full>
+    <vaadin-vertical-layout margin="false" :expand>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-label style-name="bold" plain-text _id="lblProjectSummary"></vaadin-label>
+     </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout width-full>
+      <vaadin-combo-box caption="PRIORITY" empty-selection-allowed="false" style-name="tiny" width="160px" data-item-type="org.vaadin.bugrap.domain.entities.Report.Priority" _id="cmbEditPriority"></vaadin-combo-box>
+      <vaadin-combo-box caption="TYPE" style-name="tiny" width="160px" data-item-type="org.vaadin.bugrap.domain.entities.Report.Type" _id="cmbEditType"></vaadin-combo-box>
+      <vaadin-combo-box caption="STATUS" style-name="tiny" width="160px" data-item-type="org.vaadin.bugrap.domain.entities.Report.Status" _id="cmbEditStatus"></vaadin-combo-box>
+      <vaadin-combo-box caption="ASSIGNED TO" style-name="tiny" width="160px" data-item-type="org.vaadin.bugrap.domain.entities.Reporter" _id="cmbEditAssignedTo"></vaadin-combo-box>
+      <vaadin-combo-box caption="VERSION" style-name="tiny" width="160px" data-item-type="org.vaadin.bugrap.domain.entities.ProjectVersion" _id="cmbEditVersion"></vaadin-combo-box>
+      <vaadin-button style-name="tiny" plain-text _id="btnUpdateReport" :bottom :right>
+        Update 
+      </vaadin-button>
+      <vaadin-button style-name="tiny" plain-text _id="btnRevertReport" :bottom>
+        Revert 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
+    </vaadin-vertical-layout>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout width-full>
+    <vaadin-text-area rows="12" width-full _id="txtDescription" :expand></vaadin-text-area>
+   </vaadin-horizontal-layout>
+   <vaadin-horizontal-layout spacing="false" width-full>
+    <vaadin-vertical-layout>
+     <vaadin-text-area rows="10" width-full></vaadin-text-area>
+    </vaadin-vertical-layout>
+   </vaadin-horizontal-layout>
+  </vaadin-vertical-layout>
+ </body>
+</html>

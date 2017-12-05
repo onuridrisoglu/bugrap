@@ -72,6 +72,9 @@ public class ReportsView extends ReportsViewBase implements View{
 	private void initializeUIComponents() {
 		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
 		cmbVersion.addSelectionListener(evt -> processVersionChange());
+		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
+		cmbVersion.addSelectionListener(evt -> processVersionChange());
+		btnReportSummary.addClickListener(evt -> model.openReportDetail(binder.getBean().getId()));
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
