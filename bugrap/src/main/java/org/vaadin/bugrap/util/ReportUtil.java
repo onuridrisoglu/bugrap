@@ -1,7 +1,6 @@
 package org.vaadin.bugrap.util;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.vaadin.bugrap.domain.entities.Report;
 
@@ -25,31 +24,34 @@ public class ReportUtil {
 			if (common.getVersion() != null && !common.getVersion().equals(report.getVersion()))
 				common.setVersion(null);
 		}
-		common.setSummary("<b>"+reports.size() + " reports selected</b> - Select single report to view contents");
+		if (reports.size() > 0)
+			common.setSummary("<b>" + reports.size() + " reports selected</b> - Select single report to view contents");
 		return common;
 	}
 
-	private static Report createReportFrom(Report r) {
+	public static Report createReportFrom(Report r) {
 		Report copy = new Report();
 		copy.setPriority(r.getPriority());
 		copy.setType(r.getType());
 		copy.setStatus(r.getStatus());
 		copy.setAssigned(r.getAssigned());
 		copy.setVersion(r.getVersion());
+		copy.setSummary(r.getSummary());
+		copy.setDescription(r.getDescription());
 		return copy;
 	}
 
-	public static void setCommonFields(Report report, Report commonFields) {
-		if (commonFields.getPriority() != null)
-			report.setPriority(commonFields.getPriority());
-		if (commonFields.getType() != null)
-			report.setType(commonFields.getType());
-		if (commonFields.getStatus() != null)
-			report.setStatus(commonFields.getStatus());
-		if (commonFields.getAssigned() != null)
-			report.setAssigned(commonFields.getAssigned());
-		if (commonFields.getVersion() != null)
-			report.setVersion(commonFields.getVersion());
-		
+	public static void setFields(Report report, Report copiedReport) {
+		if (copiedReport.getPriority() != null)
+			report.setPriority(copiedReport.getPriority());
+		if (copiedReport.getType() != null)
+			report.setType(copiedReport.getType());
+		if (copiedReport.getStatus() != null)
+			report.setStatus(copiedReport.getStatus());
+		if (copiedReport.getAssigned() != null)
+			report.setAssigned(copiedReport.getAssigned());
+		if (copiedReport.getVersion() != null)
+			report.setVersion(copiedReport.getVersion());
+
 	}
 }
