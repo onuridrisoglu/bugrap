@@ -129,6 +129,11 @@ public class ReportsModel extends BaseModel{
 		}
 	}
 
+	public void openReportDetail() {
+		long reportId = reportBinder.getBean().getId();
+		getNavigator().navigateTo(NAV_REPORTDET + "/reportId="+ reportId);
+	}
+
 
 
 

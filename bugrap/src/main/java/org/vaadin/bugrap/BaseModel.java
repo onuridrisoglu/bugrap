@@ -9,6 +9,7 @@ public class BaseModel {
 
 	public static final String NAV_LOGIN 	= "login";
 	public static final String NAV_REPORT	= "report";
+	public static final String NAV_REPORTDET	= "detail";
 	
 	private static final BugrapRepository repository = new BugrapRepository(DatabaseHelper.DB_LOCATION);
 	private Navigator navigator;

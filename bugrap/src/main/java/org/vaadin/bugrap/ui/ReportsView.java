@@ -62,6 +62,7 @@ public class ReportsView extends ReportsViewBase implements View{
 		
 		cmbProjectFilter.addSelectionListener(evt -> model.processProjectChange(cmbProjectFilter.getSelectedItem(), cmbVersion, cmbEditVersion));
 		cmbVersion.addSelectionListener(evt -> model.processVersionChange(cmbVersion.getSelectedItem(), gridReports));
+		btnReportSummary.addClickListener(evt -> model.openReportDetail());
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
