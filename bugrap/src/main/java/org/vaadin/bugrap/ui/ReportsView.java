@@ -112,29 +112,28 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void refreshGridContent() {
-		Collection<Report> selectedReports = new ArrayList<Report>(); 
-		selectedReports.addAll(gridReports.getSelectedItems());
 		gridReports.setItems(model.findReports(cmbProjectFilter.getValue(), cmbVersion.getValue()));
-		for (Report item : selectedReports) {
+		for (Report item : model.getSelectedReports()) {
 			gridReports.select(item);
 		}
 	}
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
-		int selectedItemCount = evt.getAllSelectedItems().size();
-		if (selectedItemCount == 0) {
+		model.setSelectedReports(gridReports.getSelectedItems());
+		if (model.getSelectionMode() == ReportsModel.SELECTIONMODE_NONE) {
 			vsplit.setSplitPosition(SLIDER_NOSELECTION);
-		}else {
+		} else {
 			binder.setBean(ReportUtil.getCommonFields(evt.getAllSelectedItems()));
-			if (selectedItemCount == 1)
+			if (model.getSelectionMode() == ReportsModel.SELECTIONMODE_SINGLE)
 				fillComments(binder.getBean().getId());
 			btnReportSummary.setCaption(binder.getBean().getSummary());
 			lblMultiReportInfo.setValue(binder.getBean().getSummary());
-			handleUIChangesWithSelection(selectedItemCount > 1);
+			handleUIChangesWithSelection();
 		}
 	}
 
-	private void handleUIChangesWithSelection(boolean isMutliSelect) {
+	private void handleUIChangesWithSelection() {
+		boolean isMutliSelect = model.getSelectionMode() == ReportsModel.SELECTIONMODE_MULTI;
 		btnReportSummary.setVisible(!isMutliSelect);
 		pnlThreadComments.setVisible(!isMutliSelect);
 		lblMultiReportInfo.setVisible(isMutliSelect);
@@ -143,7 +142,7 @@ public class ReportsView extends ReportsViewBase implements View{
 
 	private void saveReport() {
 		try {
-			model.saveReport(gridReports.getSelectedItems(), binder.getBean());
+			model.saveReport(binder.getBean());
 			Notification.show("Saved successfully", Type.TRAY_NOTIFICATION);
 			refreshGridContent();
 		} catch (ValidationException e) {
@@ -152,7 +151,7 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void revertChanges() {
-		Report binderCopy = ReportUtil.getCommonFields(gridReports.getSelectedItems());
-		binder.setBean(binderCopy);
+		Report originalCopy = model.getOriginalCopyForBinder();
+		binder.setBean(originalCopy);
 	}
 }

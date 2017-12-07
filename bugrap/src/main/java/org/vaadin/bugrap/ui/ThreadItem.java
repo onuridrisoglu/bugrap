@@ -7,7 +7,9 @@ import org.vaadin.bugrap.ui.generated.ThreadItemBase;
 public class ThreadItem extends ThreadItemBase {
 
 	public ThreadItem(Comment comment) {
-		lblAuther.setCaption(comment.getAuthor() + " (" + FineDateRenderer.getFineTextFromDate(comment.getTimestamp()) + ")");
+		String author = comment.getAuthor() != null ? comment.getAuthor().getName() : "";
+		String lastUpdate = FineDateRenderer.getFineTextFromDate(comment.getTimestamp());
+		lblAuthor.setCaption(String.format("%s (%s)", author, lastUpdate));
 		lblComment.setValue(comment.getComment());
 	}
 }
