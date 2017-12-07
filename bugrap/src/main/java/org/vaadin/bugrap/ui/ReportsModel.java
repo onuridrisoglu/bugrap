@@ -22,11 +22,12 @@ import com.vaadin.navigator.Navigator;
 
 public class ReportsModel extends BaseModel{
 
-	public static final int SELECTIONMODE_NONE 	= 0;
+	public static final int SELECTIONMODE_NONE = 0;
 	public static final int SELECTIONMODE_SINGLE = 1;
-	public static final int SELECTIONMODE_MULTI 	= 2;
+	public static final int SELECTIONMODE_MULTI = 2;
 	
 	private List<Report> selectedReports = new ArrayList<Report>();
+	private Report reportForEdit;
 	
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
@@ -39,6 +40,7 @@ public class ReportsModel extends BaseModel{
 	public void setSelectedReports(Collection<Report> reports) {
 		selectedReports.clear();
 		selectedReports.addAll(reports);
+		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
 	
 	public int getSelectionMode() {
@@ -85,9 +87,9 @@ public class ReportsModel extends BaseModel{
 		return getRepository().findReports(query);
 	}
 
-	public void saveReport(Report changedCopy) throws ValidationException {
+	public void saveReport() throws ValidationException {
 		for (Report report : selectedReports) {
-			ReportUtil.setFields(report, changedCopy);
+			ReportUtil.setFields(report, reportForEdit);
 			getRepository().save(report);
 		}
 	}
@@ -96,7 +98,11 @@ public class ReportsModel extends BaseModel{
 		return getRepository().getReportById(reportId);
 	}
 
-	public Report getOriginalCopyForBinder() {
-		return ReportUtil.getCommonFields(selectedReports);
+	public Report getReportForEdit() {
+		return reportForEdit;
+	}
+
+	public void resetReportForEdit() {
+		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
 }

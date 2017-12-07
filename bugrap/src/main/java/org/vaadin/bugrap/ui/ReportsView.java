@@ -1,6 +1,6 @@
 package org.vaadin.bugrap.ui;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
@@ -9,7 +9,6 @@ import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
 import org.vaadin.bugrap.ui.generated.ReportsViewBase;
-import org.vaadin.bugrap.util.ReportUtil;
 import org.vaadin.bugrap.util.StringUtil;
 
 import com.vaadin.data.Binder;
@@ -22,9 +21,9 @@ import com.vaadin.ui.Notification.Type;
 
 public class ReportsView extends ReportsViewBase implements View{
 
-	public static final int SLIDER_NOSELECTION		= 100;
-	public static final int SLIDER_SINGLESELECTION	= 52;
-	public static final int SLIDER_MULTISELECTION	= 78;
+	public static final int SLIDER_NOSELECTION = 100;
+	public static final int SLIDER_SINGLESELECTION = 52;
+	public static final int SLIDER_MULTISELECTION = 78;
 	
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
@@ -98,9 +97,12 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void refreshGridContent() {
+		List<Report> selectedReports = new ArrayList<Report>();
+		selectedReports.addAll(model.getSelectedReports());
 		gridReports.setItems(model.findReports(cmbProjectFilter.getValue(), cmbVersion.getValue()));
-		if (model.getSelectionMode() != ReportsModel.SELECTIONMODE_NONE)
-			gridReports.getSelectedItems().addAll(model.getSelectedReports());
+		for (Report report : selectedReports) {
+			gridReports.select(report);
+		}
 	}
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
@@ -108,9 +110,10 @@ public class ReportsView extends ReportsViewBase implements View{
 		if (model.getSelectionMode() == ReportsModel.SELECTIONMODE_NONE) {
 			vsplit.setSplitPosition(SLIDER_NOSELECTION);
 		} else {
-			binder.setBean(ReportUtil.getCommonFields(evt.getAllSelectedItems()));
-			btnReportSummary.setCaption(binder.getBean().getSummary());
-			lblMultiReportInfo.setValue(binder.getBean().getSummary());
+			Report report = model.getReportForEdit();
+			binder.setBean(report);
+			btnReportSummary.setCaption(report.getSummary());
+			lblMultiReportInfo.setValue(report.getSummary());
 			handleUIChangesWithSelection();
 		}
 	}
@@ -125,7 +128,7 @@ public class ReportsView extends ReportsViewBase implements View{
 
 	private void saveReport() {
 		try {
-			model.saveReport(binder.getBean());
+			model.saveReport();
 			Notification.show("Saved successfully", Type.TRAY_NOTIFICATION);
 			refreshGridContent();
 		} catch (ValidationException e) {
@@ -134,7 +137,7 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void revertChanges() {
-		Report originalCopy = model.getOriginalCopyForBinder();
-		binder.setBean(originalCopy);
+		model.resetReportForEdit();
+		binder.setBean(model.getReportForEdit());
 	}
 }
