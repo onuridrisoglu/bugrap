@@ -98,25 +98,25 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void refreshGridContent() {
-		Collection<Report> selectedReports = gridReports.getSelectedItems();
 		gridReports.setItems(model.findReports(cmbProjectFilter.getValue(), cmbVersion.getValue()));
-		if (selectedReports.size() > 0)
-			gridReports.getSelectedItems().addAll(selectedReports);
+		if (model.getSelectionMode() != ReportsModel.SELECTIONMODE_NONE)
+			gridReports.getSelectedItems().addAll(model.getSelectedReports());
 	}
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
-		int selectedItemCount = evt.getAllSelectedItems().size();
-		if (selectedItemCount == 0) {
+		model.setSelectedReports(gridReports.getSelectedItems());
+		if (model.getSelectionMode() == ReportsModel.SELECTIONMODE_NONE) {
 			vsplit.setSplitPosition(SLIDER_NOSELECTION);
-		}else {
+		} else {
 			binder.setBean(ReportUtil.getCommonFields(evt.getAllSelectedItems()));
 			btnReportSummary.setCaption(binder.getBean().getSummary());
 			lblMultiReportInfo.setValue(binder.getBean().getSummary());
-			handleUIChangesWithSelection(selectedItemCount > 1);
+			handleUIChangesWithSelection();
 		}
 	}
 
-	private void handleUIChangesWithSelection(boolean isMutliSelect) {
+	private void handleUIChangesWithSelection() {
+		boolean isMutliSelect = model.getSelectionMode() == ReportsModel.SELECTIONMODE_MULTI;
 		btnReportSummary.setVisible(!isMutliSelect);
 		txtReportDescription.setVisible(!isMutliSelect);
 		lblMultiReportInfo.setVisible(isMutliSelect);
@@ -125,7 +125,7 @@ public class ReportsView extends ReportsViewBase implements View{
 
 	private void saveReport() {
 		try {
-			model.saveReport(gridReports.getSelectedItems(), binder.getBean());
+			model.saveReport(binder.getBean());
 			Notification.show("Saved successfully", Type.TRAY_NOTIFICATION);
 			refreshGridContent();
 		} catch (ValidationException e) {
@@ -134,7 +134,7 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void revertChanges() {
-		Report binderCopy = ReportUtil.getCommonFields(gridReports.getSelectedItems());
-		binder.setBean(binderCopy);
+		Report originalCopy = model.getOriginalCopyForBinder();
+		binder.setBean(originalCopy);
 	}
 }
