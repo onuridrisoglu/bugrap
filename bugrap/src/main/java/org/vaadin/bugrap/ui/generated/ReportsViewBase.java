@@ -7,6 +7,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalSplitPanel;
@@ -37,6 +38,7 @@ public class ReportsViewBase extends HorizontalLayout {
 	protected ComboBox<org.vaadin.bugrap.domain.entities.ProjectVersion> cmbVersion;
 	protected Grid<org.vaadin.bugrap.domain.entities.Report> gridReports;
 	protected Button btnReportSummary;
+	protected Label lblMultiReportInfo;
 	protected ComboBox<org.vaadin.bugrap.domain.entities.Report.Priority> cmbEditPriority;
 	protected ComboBox<org.vaadin.bugrap.domain.entities.Report.Type> cmbEditType;
 	protected ComboBox<org.vaadin.bugrap.domain.entities.Report.Status> cmbEditStatus;

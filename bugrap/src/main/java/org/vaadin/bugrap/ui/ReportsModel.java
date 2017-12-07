@@ -15,14 +15,41 @@ import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
+import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 
 public class ReportsModel extends BaseModel{
 
+	public static final int SELECTIONMODE_NONE = 0;
+	public static final int SELECTIONMODE_SINGLE = 1;
+	public static final int SELECTIONMODE_MULTI = 2;
+	
+	private List<Report> selectedReports = new ArrayList<Report>();
+	private Report reportForEdit;
+	
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
+	}
+	
+	public List<Report> getSelectedReports() {
+		return selectedReports;
+	}
+
+	public void setSelectedReports(Collection<Report> reports) {
+		selectedReports.clear();
+		selectedReports.addAll(reports);
+		reportForEdit = ReportUtil.getCommonFields(selectedReports);
+	}
+	
+	public int getSelectionMode() {
+		if (selectedReports == null || selectedReports.size() == 0)
+			return SELECTIONMODE_NONE;
+		else if (selectedReports.size() == 1)
+			return SELECTIONMODE_SINGLE;
+		else
+			return SELECTIONMODE_MULTI;
 	}
 	
 	public List<Project> findProjects() {
@@ -60,16 +87,22 @@ public class ReportsModel extends BaseModel{
 		return getRepository().findReports(query);
 	}
 
-	public Report saveReport(Report report) throws ValidationException {
-		return getRepository().save(report);
+	public void saveReport() throws ValidationException {
+		for (Report report : selectedReports) {
+			ReportUtil.setFields(report, reportForEdit);
+			getRepository().save(report);
+		}
 	}
 
 	public Report getReportById(long reportId) {
 		return getRepository().getReportById(reportId);
 	}
 
+	public Report getReportForEdit() {
+		return reportForEdit;
+	}
 
-
-
-
+	public void resetReportForEdit() {
+		reportForEdit = ReportUtil.getCommonFields(selectedReports);
+	}
 }

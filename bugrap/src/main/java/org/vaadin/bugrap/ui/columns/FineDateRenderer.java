@@ -16,7 +16,6 @@ public class FineDateRenderer extends DateRenderer{
 	@Override
 	public JsonValue encode(Date value) {
 		return super.encode(getFineTextFromDate(value), String.class);
-		
 	}
 	
 	private static String getFineTextFromDate(Date value) {
@@ -35,6 +34,9 @@ public class FineDateRenderer extends DateRenderer{
 			} else if (period.getMonths() > 0) {
 				durationAmount = period.getMonths();
 				durationUnitTxt = "month";
+			} else if (period.getDays() > 7) { //Period does not support weeks
+				durationAmount = period.getDays() / 7;
+				durationUnitTxt = "week";
 			} else if (period.getDays() > 0) {
 				durationAmount = period.getDays();
 				durationUnitTxt = "day";
