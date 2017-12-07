@@ -1,9 +1,11 @@
 package org.vaadin.bugrap.ui;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
+import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
@@ -19,6 +21,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.VerticalLayout;
 
 public class ReportsView extends ReportsViewBase implements View{
 
@@ -74,11 +77,11 @@ public class ReportsView extends ReportsViewBase implements View{
 		cmbVersion.addSelectionListener(evt -> processVersionChange());
 		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
 		cmbVersion.addSelectionListener(evt -> processVersionChange());
-		btnReportSummary.addClickListener(evt -> model.openReportDetail(binder.getBean().getId()));
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> onReportSelected(evt));
+		btnReportSummary.addClickListener(evt -> model.openReportDetail(binder.getBean().getId()));
 	}
 	
 	private void initializeBinder() {
@@ -87,12 +90,20 @@ public class ReportsView extends ReportsViewBase implements View{
 		binder.bind(cmbEditStatus, Report::getStatus, Report::setStatus);
 		binder.bind(cmbEditAssignedTo, Report::getAssigned, Report::setAssigned);
 		binder.bind(cmbEditVersion, Report::getVersion, Report::setVersion);
-		binder.bind(txtReportDescription, Report::getDescription, Report::setDescription);
+	}
+	
+	private void fillComments(long reportId) {
+		VerticalLayout layout = (VerticalLayout)pnlThreadComments.getContent();
+		layout.removeAllComponents();
+		for (Comment comment : model.getComments(reportId)) {
+			layout.addComponent(new ThreadItem(comment));
+		}
 	}
 
 	private void processProjectChange() {
 		List<ProjectVersion> versions = model.findProjectVersions(cmbProjectFilter.getValue());
 		cmbVersion.setItems(versions);
+		cmbVersion.setSelectedItem(versions.get(0));
 		cmbEditVersion.setItems(versions);
 	}
 	
@@ -101,10 +112,12 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 
 	private void refreshGridContent() {
-		Collection<Report> selectedReports = gridReports.getSelectedItems();
+		Collection<Report> selectedReports = new ArrayList<Report>(); 
+		selectedReports.addAll(gridReports.getSelectedItems());
 		gridReports.setItems(model.findReports(cmbProjectFilter.getValue(), cmbVersion.getValue()));
-		if (selectedReports.size() > 0)
-			gridReports.getSelectedItems().addAll(selectedReports);
+		for (Report item : selectedReports) {
+			gridReports.select(item);
+		}
 	}
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
@@ -113,6 +126,8 @@ public class ReportsView extends ReportsViewBase implements View{
 			vsplit.setSplitPosition(SLIDER_NOSELECTION);
 		}else {
 			binder.setBean(ReportUtil.getCommonFields(evt.getAllSelectedItems()));
+			if (selectedItemCount == 1)
+				fillComments(binder.getBean().getId());
 			btnReportSummary.setCaption(binder.getBean().getSummary());
 			lblMultiReportInfo.setValue(binder.getBean().getSummary());
 			handleUIChangesWithSelection(selectedItemCount > 1);
@@ -121,7 +136,7 @@ public class ReportsView extends ReportsViewBase implements View{
 
 	private void handleUIChangesWithSelection(boolean isMutliSelect) {
 		btnReportSummary.setVisible(!isMutliSelect);
-		txtReportDescription.setVisible(!isMutliSelect);
+		pnlThreadComments.setVisible(!isMutliSelect);
 		lblMultiReportInfo.setVisible(isMutliSelect);
 		vsplit.setSplitPosition(isMutliSelect ? SLIDER_MULTISELECTION : SLIDER_SINGLESELECTION);
 	}

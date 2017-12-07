@@ -8,9 +8,11 @@
  <body>
   <vaadin-vertical-layout>
    <vaadin-horizontal-layout width-full>
-    <vaadin-label width-full plain-text _id="lblProjectVersionName" :expand>
-      &gt; 
-    </vaadin-label>
+    <vaadin-panel>
+     <vaadin-label width-full plain-text _id="lblProjectVersionName">
+       &gt; 
+     </vaadin-label>
+    </vaadin-panel>
    </vaadin-horizontal-layout>
    <vaadin-horizontal-layout spacing="false" width-full>
     <vaadin-vertical-layout margin="false" :expand>
@@ -33,11 +35,21 @@
     </vaadin-vertical-layout>
    </vaadin-horizontal-layout>
    <vaadin-horizontal-layout width-full>
-    <vaadin-text-area rows="12" width-full _id="txtDescription" :expand></vaadin-text-area>
+    <vaadin-panel size-full _id="pnlCommentsThread">
+     <vaadin-vertical-layout style-name="light"></vaadin-vertical-layout>
+    </vaadin-panel>
    </vaadin-horizontal-layout>
    <vaadin-horizontal-layout spacing="false" width-full>
-    <vaadin-vertical-layout>
-     <vaadin-text-area rows="10" width-full></vaadin-text-area>
+    <vaadin-vertical-layout margin="false">
+     <vaadin-text-area caption="Comments" rows="10" placeholder="Write a new comment..." width-full _id="txtComment"></vaadin-text-area>
+     <vaadin-horizontal-layout>
+      <vaadin-button style-name="small" plain-text _id="btnDone">
+        Done 
+      </vaadin-button>
+      <vaadin-button style-name="small" plain-text _id="btnCancel">
+        Cancel 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
     </vaadin-vertical-layout>
    </vaadin-horizontal-layout>
   </vaadin-vertical-layout>

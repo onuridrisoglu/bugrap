@@ -1,30 +1,36 @@
 package org.vaadin.bugrap.ui;
 
-import org.vaadin.bugrap.BaseModel;
-import org.vaadin.bugrap.domain.entities.Report;
+import java.util.Date;
 
-import com.vaadin.data.Binder;
+import org.vaadin.bugrap.domain.entities.Comment;
+import org.vaadin.bugrap.domain.entities.Comment.Type;
+import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.domain.entities.Reporter;
+
 import com.vaadin.navigator.Navigator;
 
-public class ReportDetailModel extends BaseModel{
-	
-	private Binder<Report> binder;
+public class ReportDetailModel extends ReportsModel{
 	
 	public ReportDetailModel(Navigator nav) {
 		super(nav);
-		binder = new Binder<Report>();
 	}
 
-	public Binder<Report> getBinder(){
-		return binder;
+	public String getReportProjectAndVersion(Report r) {
+		return r.getProject().getName() + " > " +r.getVersion().getVersion();
 	}
 
-	public void setReport(long reportId) {
-		Report report = getRepository().getReportById(reportId);
-		binder.setBean(report);
+	public void returnToReportList() {
+		getNavigator().navigateTo(NAV_REPORT);
 	}
 
-	public String getReportProjectAndVersion() {
-		return binder.getBean().getProject().getName() + " > " + binder.getBean().getVersion().getVersion();
+	public void saveComment(String commentTxt, Reporter author, Report report) {
+		Comment comment = new Comment();
+		comment.setReport(report);
+		comment.setComment(commentTxt);
+		comment.setAuthor(author);
+		comment.setTimestamp(new Date());
+		comment.setType(Type.COMMENT);
+		getRepository().save(comment);
 	}
+
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
+import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
@@ -64,8 +65,12 @@ public class ReportsModel extends BaseModel{
 	public void saveReport(Collection<Report> selectedReports, Report changedCopy) throws ValidationException {
 		for (Report report : selectedReports) {
 			ReportUtil.setFields(report, changedCopy);
-			getRepository().save(report);
+			save(report);
 		}
+	}
+	
+	public void save(Report report) {
+		getRepository().save(report);
 	}
 
 	public Report getReportById(long reportId) {
@@ -74,6 +79,25 @@ public class ReportsModel extends BaseModel{
 
 	public void openReportDetail(long reportId) {
 		getNavigator().navigateTo(NAV_REPORTDET + "/reportId="+ reportId);
+	}
+	
+	public List<Comment> getComments(long reportId) {
+		List<Comment> comments = new ArrayList<Comment>();
+		Report report = getReportById(reportId);
+		comments.add(createCommentFromReportDescription(report));
+		comments.addAll(getRepository().findComments(report));
+		return comments;
+	}
+
+	private Comment createCommentFromReportDescription(Report report) {
+		Comment comment = new Comment();
+		comment.setTimestamp(report.getReportedTimestamp());
+		comment.setAuthor(report.getAuthor());
+		comment.setComment(report.getDescription());
+		comment.setConsistencyVersion(report.getConsistencyVersion());
+		comment.setReport(report);
+		comment.setType(org.vaadin.bugrap.domain.entities.Comment.Type.COMMENT);
+		return comment;
 	}
 
 }
