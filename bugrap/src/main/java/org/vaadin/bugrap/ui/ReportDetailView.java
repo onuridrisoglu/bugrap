@@ -13,16 +13,18 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
-public class ReportDetailView extends ReportDetailViewBase implements View{
+public class ReportDetailView extends ReportDetailViewBase {
 
-	private ReportDetailModel model;
+	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
 	
-	public ReportDetailView(ReportDetailModel rdm) {
-		model = rdm;
+	public ReportDetailView(ReportsModel reportModel) {
+		model = reportModel;
 		initializeBinder();
 		initializeUIComponents();
+		init();
 	}
 	
 
@@ -38,23 +40,16 @@ public class ReportDetailView extends ReportDetailViewBase implements View{
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnDone.addClickListener(evt -> saveComment());
-		btnCancel.addClickListener(evt -> model.returnToReportList());
+		btnCancel.addClickListener(evt -> closeWindow());
 //		btnUploadAttachments.setReceiver(this);
 //		btnUploadAttachments.addStartedListener(this);
 //		btnUploadAttachments.addFinishedListener(this);
 	}
 
-	@Override
-	public void enter(ViewChangeEvent event) {
-		long reportId = Long.parseLong(event.getParameterMap().get("reportId"));
-		init(reportId);
-	}
-
-	private void init(long reportId) {
-		model.setReportForEdit(reportId);
+	private void init() {
+		Report report = model.getReportForEdit();
 		binder.setBean(model.getReportForEdit());
-		lblProjectVersionName.setValue(model.getReportProjectAndVersion());
-		lblProjectSummary.setValue(model.getReportForEdit().getSummary());
+		lblProjectSummary.setValue(report.getSummary());
 		initializeComboContents();
 		fillComments();
 	}
@@ -88,9 +83,16 @@ public class ReportDetailView extends ReportDetailViewBase implements View{
 	}
 
 	private void saveComment() {
+		if (!txtComment.getOptionalValue().isPresent())
+			return;
 		model.saveComment(txtComment.getValue(), BaseModel.loginUser);
 		fillComments();
 		txtComment.clear();
+	}
+	
+	private void closeWindow() {
+		Window window = (Window)getParent();
+		window.close();
 	}
 	
 }

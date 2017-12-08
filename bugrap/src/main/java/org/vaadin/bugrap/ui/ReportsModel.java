@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
@@ -87,7 +88,7 @@ public class ReportsModel extends BaseModel{
 		query.projectVersion = version;
 		return getRepository().findReports(query);
 	}
-
+	
 	public void saveReport() throws ValidationException {
 		for (Report report : selectedReports) {
 			ReportUtil.setFields(report, reportForEdit);
@@ -105,10 +106,6 @@ public class ReportsModel extends BaseModel{
 		return getRepository().getReportById(reportId);
 	}
 
-	public void openReportDetail(long reportId) {
-		getNavigator().navigateTo(NAV_REPORTDET + "/reportId="+ reportId);
-	}
-	
 	public List<Comment> getComments() {
 		List<Comment> comments = new ArrayList<Comment>();
 		if (getSelectionMode() != SELECTIONMODE_SINGLE) 
@@ -136,5 +133,15 @@ public class ReportsModel extends BaseModel{
 
 	public void resetReportForEdit() {
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
+	}
+	
+	public void saveComment(String commentTxt, Reporter author) {
+		Comment comment = new Comment();
+		comment.setReport(reportForEdit);
+		comment.setComment(commentTxt);
+		comment.setAuthor(author);
+		comment.setTimestamp(new Date());
+		comment.setType(Comment.Type.COMMENT);
+		getRepository().save(comment);
 	}
 }
