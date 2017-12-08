@@ -23,11 +23,12 @@ import com.vaadin.navigator.Navigator;
 
 public class ReportsModel extends BaseModel{
 
-	public static final int SELECTIONMODE_NONE 	= 0;
+	public static final int SELECTIONMODE_NONE = 0;
 	public static final int SELECTIONMODE_SINGLE = 1;
-	public static final int SELECTIONMODE_MULTI 	= 2;
+	public static final int SELECTIONMODE_MULTI = 2;
 	
 	private List<Report> selectedReports = new ArrayList<Report>();
+	protected Report reportForEdit;
 	
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
@@ -40,6 +41,7 @@ public class ReportsModel extends BaseModel{
 	public void setSelectedReports(Collection<Report> reports) {
 		selectedReports.clear();
 		selectedReports.addAll(reports);
+		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
 	
 	public int getSelectionMode() {
@@ -72,9 +74,9 @@ public class ReportsModel extends BaseModel{
 		return getRepository().findReporters();
 	}
 	
-	public List<ProjectVersion> findProjectVersions(Project selectedProject) {
+	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
-		projectVersions.addAll(getRepository().findProjectVersions(selectedProject));
+		projectVersions.addAll(getRepository().findProjectVersions(project));
 		Collections.sort(projectVersions);
 		return projectVersions;
 	}
@@ -86,14 +88,16 @@ public class ReportsModel extends BaseModel{
 		return getRepository().findReports(query);
 	}
 
-	public void saveReport(Report changedCopy) throws ValidationException {
+	public void saveReport() throws ValidationException {
 		for (Report report : selectedReports) {
-			ReportUtil.setFields(report, changedCopy);
-			save(report);
+			ReportUtil.setFields(report, reportForEdit);
+			getRepository().save(report);
 		}
 	}
 	
-	public void save(Report report) {
+	public void save() {
+		Report report = getReportById(reportForEdit.getId());
+		ReportUtil.setFields(report, reportForEdit);
 		getRepository().save(report);
 	}
 
@@ -105,11 +109,12 @@ public class ReportsModel extends BaseModel{
 		getNavigator().navigateTo(NAV_REPORTDET + "/reportId="+ reportId);
 	}
 	
-	public List<Comment> getComments(long reportId) {
+	public List<Comment> getComments() {
 		List<Comment> comments = new ArrayList<Comment>();
-		Report report = getReportById(reportId);
-		comments.add(createCommentFromReportDescription(report));
-		comments.addAll(getRepository().findComments(report));
+		if (getSelectionMode() != SELECTIONMODE_SINGLE) 
+			return comments; //No need to display comments if selection mode is not single
+		comments.add(createCommentFromReportDescription(reportForEdit));
+		comments.addAll(getRepository().findComments(reportForEdit));
 		return comments;
 	}
 
@@ -124,7 +129,12 @@ public class ReportsModel extends BaseModel{
 		return comment;
 	}
 
-	public Report getOriginalCopyForBinder() {
-		return ReportUtil.getCommonFields(selectedReports);
+	
+	public Report getReportForEdit() {
+		return reportForEdit;
+	}
+
+	public void resetReportForEdit() {
+		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
 }

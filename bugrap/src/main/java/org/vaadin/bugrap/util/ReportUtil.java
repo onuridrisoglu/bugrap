@@ -39,6 +39,10 @@ public class ReportUtil {
 		copy.setVersion(r.getVersion());
 		copy.setSummary(r.getSummary());
 		copy.setDescription(r.getDescription());
+		copy.setReportedTimestamp(r.getReportedTimestamp());
+		copy.setAuthor(r.getAuthor());
+		copy.setProject(r.getProject());
+		copy.setVersion(r.getVersion());
 		return copy;
 	}
 

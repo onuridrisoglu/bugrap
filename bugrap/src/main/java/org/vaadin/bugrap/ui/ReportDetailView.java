@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.entities.Comment;
-import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.Report;
 import org.vaadin.bugrap.ui.generated.ReportDetailViewBase;
 
@@ -33,7 +32,6 @@ public class ReportDetailView extends ReportDetailViewBase implements View{
 		binder.bind(cmbEditStatus, Report::getStatus, Report::setStatus);
 		binder.bind(cmbEditAssignedTo, Report::getAssigned, Report::setAssigned);
 		binder.bind(cmbEditVersion, Report::getVersion, Report::setVersion);
-//		binder.bind(txtDescription, Report::getDescription, Report::setDescription);
 	}
 
 	private void initializeUIComponents() {
@@ -53,46 +51,46 @@ public class ReportDetailView extends ReportDetailViewBase implements View{
 	}
 
 	private void init(long reportId) {
-		Report report = model.getReportById(reportId); 
-		binder.setBean(report);
-		lblProjectVersionName.setValue(model.getReportProjectAndVersion(report));
-		lblProjectSummary.setValue(report.getSummary());
-		initializeComboContents(report.getProject());
-		fillComments(model.getComments(reportId));
+		model.setReportForEdit(reportId);
+		binder.setBean(model.getReportForEdit());
+		lblProjectVersionName.setValue(model.getReportProjectAndVersion());
+		lblProjectSummary.setValue(model.getReportForEdit().getSummary());
+		initializeComboContents();
+		fillComments();
 	}
 	
-	private void initializeComboContents(Project project) {
+	private void initializeComboContents() {
 		cmbEditPriority.setItems(model.getPriorties());
 		cmbEditType.setItems(model.getTypes());
 		cmbEditStatus.setItems(model.getStatuses());
 		cmbEditAssignedTo.setItems(model.findReporters());
-		cmbEditVersion.setItems(model.findProjectVersions(project));
+		cmbEditVersion.setItems(model.findProjectVersions(model.getReportForEdit().getProject()));
 	}
 	
-	private void fillComments(List<Comment> comments) {
+	private void fillComments() {
 		VerticalLayout layout = (VerticalLayout) pnlCommentsThread.getContent();
 		layout.removeAllComponents();
-		
+		List<Comment> comments = model.getComments();
 		for (Comment comment : comments) {
-			layout.addComponent(new ThreadItem(comment));
+			layout.addComponent(new ThreadItemView(new ThreadItemModel(comment)));
 		}
 	}
 	
 	
 	private void saveReport() {
-		model.save(binder.getBean());
+		model.save();
 		Notification.show("Saved successfully", Type.TRAY_NOTIFICATION);
 	}
 	
 	private void revertChanges() {
-		long reportId = binder.getBean().getId();
-		binder.setBean(model.getReportById(reportId));
+		model.resetReportForEdit();
+		binder.setBean(model.getReportForEdit());
 	}
 
 	private void saveComment() {
-		model.saveComment(txtComment.getValue(), BaseModel.loginUser, binder.getBean());
-		fillComments(model.getComments(binder.getBean().getId()));
-		txtComment.setValue(null);
+		model.saveComment(txtComment.getValue(), BaseModel.loginUser);
+		fillComments();
+		txtComment.clear();
 	}
 	
 }
