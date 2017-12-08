@@ -42,11 +42,15 @@
    <vaadin-horizontal-layout spacing="false" width-full>
     <vaadin-vertical-layout margin="false">
      <vaadin-text-area caption="Comments" rows="10" placeholder="Write a new comment..." width-full _id="txtComment"></vaadin-text-area>
+     <vaadin-panel visible="false" _id="pnlAttachments">
+      <vaadin-horizontal-layout></vaadin-horizontal-layout>
+     </vaadin-panel>
      <vaadin-horizontal-layout>
-      <vaadin-button style-name="small" plain-text _id="btnDone">
+      <vaadin-button plain-text _id="btnDone">
         Done 
       </vaadin-button>
-      <vaadin-button style-name="small" plain-text _id="btnCancel">
+      <vaadin-upload button-caption="Attachments..." _id="btnUpload"></vaadin-upload>
+      <vaadin-button plain-text _id="btnCancel">
         Cancel 
       </vaadin-button>
      </vaadin-horizontal-layout>

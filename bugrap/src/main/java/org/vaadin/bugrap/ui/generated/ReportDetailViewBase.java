@@ -7,6 +7,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.declarative.Design;
 
@@ -33,7 +34,9 @@ public class ReportDetailViewBase extends VerticalLayout {
 	protected Button btnRevertReport;
 	protected Panel pnlCommentsThread;
 	protected TextArea txtComment;
+	protected Panel pnlAttachments;
 	protected Button btnDone;
+	protected Upload btnUpload;
 	protected Button btnCancel;
 
 	public ReportDetailViewBase() {

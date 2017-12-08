@@ -1,6 +1,8 @@
 package org.vaadin.bugrap.ui;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Comment.Type;
@@ -9,6 +11,8 @@ import org.vaadin.bugrap.domain.entities.Reporter;
 import com.vaadin.navigator.Navigator;
 
 public class ReportDetailModel extends ReportsModel{
+	
+	private Map<String, Object> attachmentUIElements = new HashMap<String, Object>();
 	
 	public ReportDetailModel(Navigator nav) {
 		super(nav);
@@ -38,4 +42,7 @@ public class ReportDetailModel extends ReportsModel{
 		getRepository().save(comment);
 	}
 
+	public Map<String, Object> getAttachmentUIElements() {
+		return attachmentUIElements;
+	}
 }
