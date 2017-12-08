@@ -6,14 +6,7 @@
   <meta name="vaadin-version" content="8.0.5">
  </head>
  <body>
-  <vaadin-vertical-layout>
-   <vaadin-horizontal-layout width-full>
-    <vaadin-panel>
-     <vaadin-label width-full plain-text _id="lblProjectVersionName">
-       &gt; 
-     </vaadin-label>
-    </vaadin-panel>
-   </vaadin-horizontal-layout>
+  <vaadin-vertical-layout style-name="well">
    <vaadin-horizontal-layout spacing="false" width-full>
     <vaadin-vertical-layout margin="false" :expand>
      <vaadin-horizontal-layout width-full>
@@ -39,7 +32,7 @@
      <vaadin-vertical-layout style-name="light"></vaadin-vertical-layout>
     </vaadin-panel>
    </vaadin-horizontal-layout>
-   <vaadin-horizontal-layout spacing="false" width-full>
+   <vaadin-horizontal-layout width-full>
     <vaadin-vertical-layout margin="false">
      <vaadin-text-area caption="Comments" rows="10" placeholder="Write a new comment..." width-full _id="txtComment"></vaadin-text-area>
      <vaadin-panel visible="false" _id="pnlAttachments">

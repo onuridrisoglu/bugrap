@@ -20,6 +20,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class ReportsView extends ReportsViewBase implements View{
 
@@ -79,9 +80,9 @@ public class ReportsView extends ReportsViewBase implements View{
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> onReportSelected(evt));
-		btnReportSummary.addClickListener(evt -> model.openReportDetail(binder.getBean().getId()));
+		btnReportSummary.addClickListener(evt -> openReportDetail());
 	}
-	
+
 	private void initializeBinder() {
 		binder.bind(cmbEditPriority, Report::getPriority, Report::setPriority);
 		binder.bind(cmbEditType, Report::getType, Report::setType);
@@ -154,5 +155,16 @@ public class ReportsView extends ReportsViewBase implements View{
 	private void revertChanges() {
 		model.resetReportForEdit();
 		binder.setBean(model.getReportForEdit());
+	}
+	
+	private void openReportDetail() {
+		Window window = new Window();
+		window.setCaption(String.format("%s > %s", model.getReportForEdit().getProject().getName(), model.getReportForEdit().getVersion().getVersion()));
+		window.setSizeFull();
+		
+		ReportDetailView view = new ReportDetailView(model);
+		window.setContent(view);
+		
+		getUI().addWindow(window);
 	}
 }

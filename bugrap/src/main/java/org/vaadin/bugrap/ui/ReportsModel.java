@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
@@ -28,6 +31,7 @@ public class ReportsModel extends BaseModel{
 	public static final int SELECTIONMODE_MULTI = 2;
 	
 	private List<Report> selectedReports = new ArrayList<Report>();
+	private Map<String, Object> attachmentUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
 	
 	public ReportsModel(Navigator navigator) {
@@ -51,6 +55,10 @@ public class ReportsModel extends BaseModel{
 			return SELECTIONMODE_SINGLE;
 		else
 			return SELECTIONMODE_MULTI;
+	}
+	
+	public Map<String, Object> getAttachmentUIElements() {
+		return attachmentUIElements;
 	}
 	
 	public List<Project> findProjects() {
@@ -87,7 +95,7 @@ public class ReportsModel extends BaseModel{
 		query.projectVersion = version;
 		return getRepository().findReports(query);
 	}
-
+	
 	public void saveReport() throws ValidationException {
 		for (Report report : selectedReports) {
 			ReportUtil.setFields(report, reportForEdit);
@@ -105,10 +113,6 @@ public class ReportsModel extends BaseModel{
 		return getRepository().getReportById(reportId);
 	}
 
-	public void openReportDetail(long reportId) {
-		getNavigator().navigateTo(NAV_REPORTDET + "/reportId="+ reportId);
-	}
-	
 	public List<Comment> getComments() {
 		List<Comment> comments = new ArrayList<Comment>();
 		if (getSelectionMode() != SELECTIONMODE_SINGLE) 
@@ -136,5 +140,15 @@ public class ReportsModel extends BaseModel{
 
 	public void resetReportForEdit() {
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
+	}
+	
+	public void saveComment(String commentTxt, Reporter author) {
+		Comment comment = new Comment();
+		comment.setReport(reportForEdit);
+		comment.setComment(commentTxt);
+		comment.setAuthor(author);
+		comment.setTimestamp(new Date());
+		comment.setType(Comment.Type.COMMENT);
+		getRepository().save(comment);
 	}
 }

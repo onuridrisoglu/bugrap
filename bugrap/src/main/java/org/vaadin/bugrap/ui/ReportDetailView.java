@@ -28,16 +28,19 @@ import com.vaadin.ui.Upload.StartedListener;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
-public class ReportDetailView extends ReportDetailViewBase implements View, Receiver, SucceededListener, StartedListener, ProgressListener{
+public class ReportDetailView extends ReportDetailViewBase implements Receiver, SucceededListener, StartedListener, ProgressListener{
 
-	private ReportDetailModel model;
+
+	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
 	
-	public ReportDetailView(ReportDetailModel rdm) {
-		model = rdm;
+	public ReportDetailView(ReportsModel reportModel) {
+		model = reportModel;
 		initializeBinder();
 		initializeUIComponents();
+		init();
 	}
 	
 
@@ -53,7 +56,7 @@ public class ReportDetailView extends ReportDetailViewBase implements View, Rece
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnDone.addClickListener(evt -> saveComment());
-		btnCancel.addClickListener(evt -> model.returnToReportList());
+		btnCancel.addClickListener(evt -> closeWindow());
 		
 		btnUpload.setReceiver(this);
 		btnUpload.addStartedListener(this);
@@ -61,19 +64,12 @@ public class ReportDetailView extends ReportDetailViewBase implements View, Rece
 		btnUpload.addProgressListener(this);
 	}
 
-	@Override
-	public void enter(ViewChangeEvent event) {
-		long reportId = Long.parseLong(event.getParameterMap().get("reportId"));
-		init(reportId);
+	private void init() {
 		((HorizontalLayout)pnlAttachments.getContent()).removeAllComponents();
 		pnlAttachments.setVisible(false);
-	}
-
-	private void init(long reportId) {
-		model.setReportForEdit(reportId);
+		Report report = model.getReportForEdit();
 		binder.setBean(model.getReportForEdit());
-		lblProjectVersionName.setValue(model.getReportProjectAndVersion());
-		lblProjectSummary.setValue(model.getReportForEdit().getSummary());
+		lblProjectSummary.setValue(report.getSummary());
 		initializeComboContents();
 		fillComments();
 	}
@@ -107,6 +103,8 @@ public class ReportDetailView extends ReportDetailViewBase implements View, Rece
 	}
 
 	private void saveComment() {
+		if (!txtComment.getOptionalValue().isPresent())
+			return;
 		model.saveComment(txtComment.getValue(), BaseModel.loginUser);
 		fillComments();
 		txtComment.clear();
@@ -126,7 +124,6 @@ public class ReportDetailView extends ReportDetailViewBase implements View, Rece
 
 	@Override
 	public void uploadSucceeded(SucceededEvent event) {
-		Notification.show("Uploaded", Type.TRAY_NOTIFICATION);
 		ProgressBar progress = (ProgressBar) model.getAttachmentUIElements().get(event.getFilename());
 		HorizontalLayout layout = (HorizontalLayout) pnlAttachments.getContent();
 		layout.removeComponent(progress);
@@ -160,6 +157,11 @@ public class ReportDetailView extends ReportDetailViewBase implements View, Rece
 		}
 		if (bar != null)
 			bar.setValue(((float)readBytes)/contentLength);
+	}
+	
+	private void closeWindow() {
+		Window window = (Window)getParent();
+		window.close();
 	}
 	
 }
