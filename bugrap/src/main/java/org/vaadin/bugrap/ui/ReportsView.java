@@ -17,6 +17,8 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.ClientConnector.AttachListener;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
@@ -30,6 +32,8 @@ public class ReportsView extends ReportsViewBase implements View{
 	
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
+	BrowserWindowOpener windowOpener = new BrowserWindowOpener(ReportDetailConnector.class);
+
 	
 	
 	public ReportsView(ReportsModel m) {
@@ -80,7 +84,9 @@ public class ReportsView extends ReportsViewBase implements View{
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> onReportSelected(evt));
-		btnReportSummary.addClickListener(evt -> openReportDetail());
+		
+		windowOpener.extend(btnReportSummary);
+//		btnReportSummary.addClickListener(evt -> openReportDetail());
 	}
 
 	private void initializeBinder() {
@@ -122,6 +128,7 @@ public class ReportsView extends ReportsViewBase implements View{
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
 		model.setSelectedReports(gridReports.getSelectedItems());
+		windowOpener.setParameter("selectedItems", model.getSelectedReportsText());
 		if (model.getSelectionMode() == ReportsModel.SELECTIONMODE_NONE) {
 			vsplit.setSplitPosition(SLIDER_NOSELECTION);
 		} else {
@@ -158,6 +165,7 @@ public class ReportsView extends ReportsViewBase implements View{
 	}
 	
 	private void openReportDetail() {
+		
 		Window window = new Window();
 		window.setCaption(String.format("%s > %s", model.getReportForEdit().getProject().getName(), model.getReportForEdit().getVersion().getVersion()));
 		window.setSizeFull();
@@ -165,6 +173,6 @@ public class ReportsView extends ReportsViewBase implements View{
 		ReportDetailView view = new ReportDetailView(model);
 		window.setContent(view);
 		
-		getUI().addWindow(window);
+//		getUI().addWindow(window);
 	}
 }

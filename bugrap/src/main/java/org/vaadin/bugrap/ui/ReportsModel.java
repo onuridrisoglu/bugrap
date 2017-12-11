@@ -144,4 +144,23 @@ public class ReportsModel extends BaseModel{
 		comment.setType(Comment.Type.COMMENT);
 		getRepository().save(comment);
 	}
+
+	public String getSelectedReportsText() {
+		StringBuilder builder = new StringBuilder();
+		for (Report report : selectedReports) {
+			if (builder.length() > 0)
+				builder.append(",");
+			builder.append(report.getId());
+		}
+		return builder.toString();
+	}
+
+	public void setSelectedReportsFromText(String selectedReportsText) {
+		String[] reportIds = selectedReportsText.split(",");
+		selectedReports.clear();
+		for (String id : reportIds) {
+			selectedReports.add(getReportById(Long.parseLong(id)));
+		}
+		resetReportForEdit();
+	}
 }
