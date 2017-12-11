@@ -37,6 +37,8 @@ public class BugrapUI extends UI {
 		final ReportsView reportsView = new ReportsView(new ReportsModel(navigator));
 		navigator.addView(BaseModel.NAV_REPORT, reportsView);
 		navigator.navigateTo(BaseModel.NAV_LOGIN);
+		
+		navigator.navigateTo(BaseModel.NAV_LOGIN );
 	}
 
     @WebServlet(urlPatterns = "/*", name = "BugrapUIServlet", asyncSupported = true)

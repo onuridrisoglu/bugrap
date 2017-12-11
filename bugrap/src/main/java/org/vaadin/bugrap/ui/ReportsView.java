@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
+import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
@@ -16,8 +17,12 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.ClientConnector.AttachListener;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class ReportsView extends ReportsViewBase implements View{
 
@@ -27,6 +32,8 @@ public class ReportsView extends ReportsViewBase implements View{
 	
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
+	BrowserWindowOpener windowOpener = new BrowserWindowOpener(ReportDetailConnector.class);
+
 	
 	
 	public ReportsView(ReportsModel m) {
@@ -71,24 +78,38 @@ public class ReportsView extends ReportsViewBase implements View{
 	private void initializeUIComponents() {
 		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
 		cmbVersion.addSelectionListener(evt -> processVersionChange());
+		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
+		cmbVersion.addSelectionListener(evt -> processVersionChange());
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> onReportSelected(evt));
+		
+		windowOpener.extend(btnReportSummary);
+//		btnReportSummary.addClickListener(evt -> openReportDetail());
 	}
-	
+
 	private void initializeBinder() {
 		binder.bind(cmbEditPriority, Report::getPriority, Report::setPriority);
 		binder.bind(cmbEditType, Report::getType, Report::setType);
 		binder.bind(cmbEditStatus, Report::getStatus, Report::setStatus);
 		binder.bind(cmbEditAssignedTo, Report::getAssigned, Report::setAssigned);
 		binder.bind(cmbEditVersion, Report::getVersion, Report::setVersion);
-		binder.bind(txtReportDescription, Report::getDescription, Report::setDescription);
+	}
+	
+	private void fillComments() {
+		VerticalLayout layout = (VerticalLayout)pnlThreadComments.getContent();
+		layout.removeAllComponents();
+		List<Comment> comments = model.getComments();
+		for (Comment comment : comments) {
+			layout.addComponent(new ThreadItemView(new ThreadItemModel(comment)));
+		}
 	}
 
 	private void processProjectChange() {
 		List<ProjectVersion> versions = model.findProjectVersions(cmbProjectFilter.getValue());
 		cmbVersion.setItems(versions);
+		cmbVersion.setSelectedItem(versions.get(0));
 		cmbEditVersion.setItems(versions);
 	}
 	
@@ -107,6 +128,7 @@ public class ReportsView extends ReportsViewBase implements View{
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
 		model.setSelectedReports(gridReports.getSelectedItems());
+		windowOpener.setParameter("selectedItems", model.getSelectedReportsText());
 		if (model.getSelectionMode() == ReportsModel.SELECTIONMODE_NONE) {
 			vsplit.setSplitPosition(SLIDER_NOSELECTION);
 		} else {
@@ -114,6 +136,7 @@ public class ReportsView extends ReportsViewBase implements View{
 			binder.setBean(report);
 			btnReportSummary.setCaption(report.getSummary());
 			lblMultiReportInfo.setValue(report.getSummary());
+			fillComments();
 			handleUIChangesWithSelection();
 		}
 	}
@@ -121,7 +144,7 @@ public class ReportsView extends ReportsViewBase implements View{
 	private void handleUIChangesWithSelection() {
 		boolean isMutliSelect = model.getSelectionMode() == ReportsModel.SELECTIONMODE_MULTI;
 		btnReportSummary.setVisible(!isMutliSelect);
-		txtReportDescription.setVisible(!isMutliSelect);
+		pnlThreadComments.setVisible(!isMutliSelect);
 		lblMultiReportInfo.setVisible(isMutliSelect);
 		vsplit.setSplitPosition(isMutliSelect ? SLIDER_MULTISELECTION : SLIDER_SINGLESELECTION);
 	}
@@ -139,5 +162,17 @@ public class ReportsView extends ReportsViewBase implements View{
 	private void revertChanges() {
 		model.resetReportForEdit();
 		binder.setBean(model.getReportForEdit());
+	}
+	
+	private void openReportDetail() {
+		
+		Window window = new Window();
+		window.setCaption(String.format("%s > %s", model.getReportForEdit().getProject().getName(), model.getReportForEdit().getVersion().getVersion()));
+		window.setSizeFull();
+		
+		ReportDetailView view = new ReportDetailView(model);
+		window.setContent(view);
+		
+//		getUI().addWindow(window);
 	}
 }

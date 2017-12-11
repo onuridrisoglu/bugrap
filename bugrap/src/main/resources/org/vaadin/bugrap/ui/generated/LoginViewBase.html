@@ -4,22 +4,27 @@
   <meta charset="UTF-8">
   <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;GENERATE_GETTERS&quot;:false,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="8.0.5">
+  <meta name="package-mapping" content="com_vaadin:com.vaadin">
  </head>
  <body>
-  <vaadin-form-layout caption="Welcome to Bugrap" responsive size-auto value="Welcome to Bugrap" margin>
-    <vaadin-label plain-text>
-      Welcome to Bugrap 
-    </vaadin-label>
-   <vaadin-text-field placeholder="Username" _id="username"></vaadin-text-field>
-   <vaadin-password-field placeholder="Password" _id="password"></vaadin-password-field>
-   <vaadin-horizontal-layout>
-    <vaadin-button style-name="primary" plain-text _id="loginBtn" :right>
-      Login 
-    </vaadin-button>
-    <vaadin-button plain-text _id="clearBtn" :right>
-      Clear 
-    </vaadin-button>
-   </vaadin-horizontal-layout>
-  </vaadin-form-layout>
+  <vaadin-vertical-layout responsive size-full>
+   <vaadin-panel style-name="well" size-auto _id="panel" :middle :center>
+    <vaadin-form-layout size-full margin>
+     <vaadin-label plain-text>
+       Welcome to Bugrap 
+     </vaadin-label>
+     <vaadin-text-field placeholder="Username" _id="username"></vaadin-text-field>
+     <vaadin-password-field placeholder="Password" _id="password"></vaadin-password-field>
+     <vaadin-horizontal-layout>
+      <vaadin-button style-name="primary" plain-text _id="loginBtn" :right>
+        Login 
+      </vaadin-button>
+      <vaadin-button plain-text _id="clearBtn" :right>
+        Clear 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
+    </vaadin-form-layout>
+   </vaadin-panel>
+  </vaadin-vertical-layout>
  </body>
 </html>

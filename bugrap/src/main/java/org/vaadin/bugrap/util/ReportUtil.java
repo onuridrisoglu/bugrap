@@ -24,13 +24,14 @@ public class ReportUtil {
 			if (common.getVersion() != null && !common.getVersion().equals(report.getVersion()))
 				common.setVersion(null);
 		}
-		if (reports.size() > 0)
+		if (reports.size() > 1)
 			common.setSummary("<b>" + reports.size() + " reports selected</b> - Select single report to view contents");
 		return common;
 	}
 
 	public static Report createReportFrom(Report r) {
 		Report copy = new Report();
+		copy.setId(r.getId());
 		copy.setPriority(r.getPriority());
 		copy.setType(r.getType());
 		copy.setStatus(r.getStatus());
@@ -38,6 +39,10 @@ public class ReportUtil {
 		copy.setVersion(r.getVersion());
 		copy.setSummary(r.getSummary());
 		copy.setDescription(r.getDescription());
+		copy.setReportedTimestamp(r.getReportedTimestamp());
+		copy.setAuthor(r.getAuthor());
+		copy.setProject(r.getProject());
+		copy.setVersion(r.getVersion());
 		return copy;
 	}
 

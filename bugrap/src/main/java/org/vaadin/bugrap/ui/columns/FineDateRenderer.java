@@ -18,7 +18,7 @@ public class FineDateRenderer extends DateRenderer{
 		return super.encode(getFineTextFromDate(value), String.class);
 	}
 	
-	private static String getFineTextFromDate(Date value) {
+	public static String getFineTextFromDate(Date value) {
 		long durationAmount = 0;
 		String durationUnitTxt = "";
 		
