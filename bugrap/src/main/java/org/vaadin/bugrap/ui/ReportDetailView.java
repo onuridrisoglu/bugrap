@@ -1,9 +1,10 @@
 package org.vaadin.bugrap.ui;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.List;
 
 import org.vaadin.bugrap.BaseModel;
@@ -12,12 +13,9 @@ import org.vaadin.bugrap.domain.entities.Report;
 import org.vaadin.bugrap.ui.generated.ReportDetailViewBase;
 
 import com.vaadin.data.Binder;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Resource;
-import com.vaadin.ui.Button;
+import com.vaadin.server.FileResource;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.IconGenerator;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ProgressBar;
@@ -128,18 +126,26 @@ public class ReportDetailView extends ReportDetailViewBase implements Receiver, 
 		HorizontalLayout layout = (HorizontalLayout) pnlAttachments.getContent();
 		layout.removeComponent(progress);
 		
-		Button button = new Button(event.getFilename());
-		button.setStyleName("tiny borderless-colored");
-		layout.addComponent(button);
-		model.getAttachmentUIElements().put(event.getFilename(), button);
+		FileResource file = new FileResource(new File(ReportsModel.FILEUPLOAD_PATH + event.getFilename()));
+		Link link = new Link(event.getFilename(), file);
+		link.setStyleName("tiny");
+		layout.addComponent(link);
+		model.getAttachmentUIElements().put(event.getFilename(), link);
+		try {
+			model.saveAttachment(event.getFilename(), event.getMIMEType(), file.getStream());
+		} catch (IOException e) {
+			Notification.show("Error occurred while uploading the file", e.getMessage(), Type.ERROR_MESSAGE);
+		}
+		//Refresh comments after new comment;
+		fillComments();
 	}
-
+	
 
 	@Override
 	public OutputStream receiveUpload(String filename, String mimeType) {
 		FileOutputStream fos = null;
 		try {
-			fos = new FileOutputStream("/Users/onuridrisoglu/Downloads/temp/"+filename);
+			fos = new FileOutputStream(ReportsModel.FILEUPLOAD_PATH + filename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {

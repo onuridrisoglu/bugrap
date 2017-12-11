@@ -5,25 +5,21 @@ import org.vaadin.bugrap.ui.columns.FineDateRenderer;
 
 public class ThreadItemModel {
 	
-	private String author;
-	private String lastUpdate;
-	private String txtComment;
+	private Comment comment;
 	
-	public ThreadItemModel(Comment comment) {
-		author = comment.getAuthor() != null ? comment.getAuthor().getName() : "";
-		lastUpdate = FineDateRenderer.getFineTextFromDate(comment.getTimestamp());
-		txtComment = comment.getComment();
+	public ThreadItemModel(Comment c) {
+		comment = c;
 	}
 	
-	public String getAuthor() {
-		return author;
+	public String getAuthorText() {
+		return comment.getAuthor() != null ? comment.getAuthor().getName() : "";
 	}
 	
-	public String getLastUpdate() {
-		return lastUpdate;
+	public String getLastUpdateText() {
+		return FineDateRenderer.getFineTextFromDate(comment.getTimestamp());
 	}
 	
-	public String getTxtComment() {
-		return txtComment;
+	public Comment getComment() {
+		return comment;
 	}
 }

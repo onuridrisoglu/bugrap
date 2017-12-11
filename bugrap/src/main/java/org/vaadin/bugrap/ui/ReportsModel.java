@@ -1,5 +1,6 @@
 package org.vaadin.bugrap.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,12 +24,15 @@ import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.DownloadStream;
 
 public class ReportsModel extends BaseModel{
 
 	public static final int SELECTIONMODE_NONE = 0;
 	public static final int SELECTIONMODE_SINGLE = 1;
 	public static final int SELECTIONMODE_MULTI = 2;
+	
+	public static final String FILEUPLOAD_PATH = "/Users/onuridrisoglu/Downloads/temp/";
 	
 	private List<Report> selectedReports = new ArrayList<Report>();
 	private Map<String, Object> attachmentUIElements = new HashMap<String, Object>();
@@ -150,5 +154,17 @@ public class ReportsModel extends BaseModel{
 		comment.setTimestamp(new Date());
 		comment.setType(Comment.Type.COMMENT);
 		getRepository().save(comment);
+	}
+
+	public void saveAttachment(String filename, String mimeType, DownloadStream stream) throws IOException {
+		Comment comment = new Comment();
+		comment.setReport(reportForEdit);
+		comment.setAttachment(stream.getStream().readAllBytes());
+		comment.setAttachmentName(filename);
+		comment.setAuthor(BaseModel.loginUser);
+		comment.setTimestamp(new Date());
+		comment.setType(Comment.Type.ATTACHMENT);
+		getRepository().save(comment);
+		
 	}
 }
