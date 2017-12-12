@@ -26,22 +26,23 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DownloadStream;
 
-public class ReportsModel extends BaseModel{
+public class ReportsModel extends BaseModel {
 
 	public static final int SELECTIONMODE_NONE = 0;
 	public static final int SELECTIONMODE_SINGLE = 1;
 	public static final int SELECTIONMODE_MULTI = 2;
-	
+
 	public static final String FILEUPLOAD_PATH = "/Users/onuridrisoglu/Downloads/temp/";
-	
+
 	private List<Report> selectedReports = new ArrayList<Report>();
-	private Map<String, Object> attachmentUIElements = new HashMap<String, Object>();
+	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
+	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
-	
+
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
 	}
-	
+
 	public List<Report> getSelectedReports() {
 		return selectedReports;
 	}
@@ -51,7 +52,7 @@ public class ReportsModel extends BaseModel{
 		selectedReports.addAll(reports);
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
-	
+
 	public int getSelectionMode() {
 		if (selectedReports == null || selectedReports.size() == 0)
 			return SELECTIONMODE_NONE;
@@ -60,9 +61,17 @@ public class ReportsModel extends BaseModel{
 		else
 			return SELECTIONMODE_MULTI;
 	}
-	
-	public Map<String, Object> getAttachmentUIElements() {
-		return attachmentUIElements;
+
+	public Map<String, Object> getUploadingUIElements() {
+		return uploadingUIElements;
+	}
+
+	public List<Comment> getUploadedFilesToSave() {
+		return uploadedFilesToSave;
+	}
+
+	public void setUploadedFilesToSave(List<Comment> uploadedFilesToSave) {
+		this.uploadedFilesToSave = uploadedFilesToSave;
 	}
 	
 	public List<Project> findProjects() {
@@ -71,42 +80,44 @@ public class ReportsModel extends BaseModel{
 		Collections.sort(projects);
 		return projects;
 	}
-	
+
 	public Collection<Priority> getPriorties() {
 		return Arrays.asList(Priority.values());
 	}
+
 	public Collection<Type> getTypes() {
 		return Arrays.asList(Type.values());
 	}
+
 	public Collection<Status> getStatuses() {
 		return Arrays.asList(Status.values());
 	}
-	
+
 	public Collection<Reporter> findReporters() {
 		return getRepository().findReporters();
 	}
-	
+
 	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(project));
 		Collections.sort(projectVersions);
 		return projectVersions;
 	}
-	
-	public Collection<Report> findReports(Project project, ProjectVersion version){
+
+	public Collection<Report> findReports(Project project, ProjectVersion version) {
 		ReportsQuery query = new ReportsQuery();
 		query.project = project;
 		query.projectVersion = version;
 		return getRepository().findReports(query);
 	}
-	
+
 	public void saveReport() throws ValidationException {
 		for (Report report : selectedReports) {
 			ReportUtil.setFields(report, reportForEdit);
 			getRepository().save(report);
 		}
 	}
-	
+
 	public void save() {
 		Report report = getReportById(reportForEdit.getId());
 		ReportUtil.setFields(report, reportForEdit);
@@ -119,8 +130,8 @@ public class ReportsModel extends BaseModel{
 
 	public List<Comment> getComments() {
 		List<Comment> comments = new ArrayList<Comment>();
-		if (getSelectionMode() != SELECTIONMODE_SINGLE) 
-			return comments; //No need to display comments if selection mode is not single
+		if (getSelectionMode() != SELECTIONMODE_SINGLE)
+			return comments; // No need to display comments if selection mode is not single
 		comments.add(createCommentFromReportDescription(reportForEdit));
 		comments.addAll(getRepository().findComments(reportForEdit));
 		return comments;
@@ -137,7 +148,6 @@ public class ReportsModel extends BaseModel{
 		return comment;
 	}
 
-	
 	public Report getReportForEdit() {
 		return reportForEdit;
 	}
@@ -145,7 +155,7 @@ public class ReportsModel extends BaseModel{
 	public void resetReportForEdit() {
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
-	
+
 	public void saveComment(String commentTxt, Reporter author) {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
@@ -156,7 +166,7 @@ public class ReportsModel extends BaseModel{
 		getRepository().save(comment);
 	}
 
-	public void saveAttachment(String filename, String mimeType, DownloadStream stream) throws IOException {
+	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
 		comment.setAttachment(stream.getStream().readAllBytes());
@@ -164,7 +174,18 @@ public class ReportsModel extends BaseModel{
 		comment.setAuthor(BaseModel.loginUser);
 		comment.setTimestamp(new Date());
 		comment.setType(Comment.Type.ATTACHMENT);
-		getRepository().save(comment);
-		
+		return comment;
+	}
+
+	public void attachFile(String filename, String mimeType, DownloadStream stream) throws IOException {
+		Comment attachmentComment = createComment(filename, mimeType, stream);
+		uploadedFilesToSave.add(attachmentComment);
+	}
+
+	public void saveAttachments() {
+		for (Comment attachment : uploadedFilesToSave) {
+			getRepository().save(attachment);
+		}
+		uploadedFilesToSave.clear();
 	}
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import org.vaadin.bugrap.domain.entities.Comment.Type;
 import org.vaadin.bugrap.ui.generated.ThreadItemBase;
 
+import com.vaadin.server.FileDownloader;
 import com.vaadin.server.StreamResource;
 
 public class ThreadItemView extends ThreadItemBase {
@@ -27,12 +28,15 @@ public class ThreadItemView extends ThreadItemBase {
 			lblComment.setVisible(false);
 			lnkAttachment.setVisible(true);
 			lnkAttachment.setCaption(model.getComment().getAttachmentName());
-			lnkAttachment.setResource(new StreamResource(new StreamResource.StreamSource() {
-				@Override
-				public InputStream getStream() {
-					return new ByteArrayInputStream(model.getComment().getAttachment());
-				}
-			}, model.getComment().getAttachmentName()));
+			FileDownloader downloader = new FileDownloader(
+											new StreamResource(new StreamResource.StreamSource() {
+												@Override
+												public InputStream getStream() {
+													return new ByteArrayInputStream(model.getComment().getAttachment());
+												}
+											}, 
+											model.getComment().getAttachmentName()));
+			downloader.extend(lnkAttachment);
 		}
 
 	}
