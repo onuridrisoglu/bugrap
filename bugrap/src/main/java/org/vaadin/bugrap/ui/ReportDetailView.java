@@ -29,7 +29,8 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-public class ReportDetailView extends ReportDetailViewBase implements Receiver, SucceededListener, StartedListener, ProgressListener {
+public class ReportDetailView extends ReportDetailViewBase
+		implements Receiver, SucceededListener, StartedListener, ProgressListener {
 
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
@@ -58,7 +59,7 @@ public class ReportDetailView extends ReportDetailViewBase implements Receiver, 
 		btnUpload.addStartedListener(this);
 		btnUpload.addSucceededListener(this);
 		btnUpload.addProgressListener(this);
-		txtComment.addValueChangeListener( evt-> commentsUpdated());
+		txtComment.addValueChangeListener(evt -> commentsUpdated());
 	}
 
 	private void init() {
@@ -80,9 +81,9 @@ public class ReportDetailView extends ReportDetailViewBase implements Receiver, 
 		cmbEditType.setItems(model.getTypes());
 		cmbEditStatus.setItems(model.getStatuses());
 		cmbEditAssignedTo.setItems(model.findReporters());
-		cmbEditVersion.setItems(model.findProjectVersions(model.getReportForEdit().getProject()));
+		cmbEditVersion.setItems(model.findProjectVersions());
 	}
-	
+
 	private void fillComments() {
 		VerticalLayout layout = (VerticalLayout) pnlCommentsThread.getContent();
 		layout.removeAllComponents();
@@ -93,7 +94,7 @@ public class ReportDetailView extends ReportDetailViewBase implements Receiver, 
 		txtComment.clear();
 		btnDone.setEnabled(false);
 	}
-	
+
 	private void commentsUpdated() {
 		btnDone.setEnabled(true);
 	}

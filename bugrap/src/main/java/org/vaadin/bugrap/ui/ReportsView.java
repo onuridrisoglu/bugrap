@@ -14,7 +14,6 @@ import org.vaadin.bugrap.util.StringUtil;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
-import com.vaadin.event.UIEvents;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -23,16 +22,15 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-public class ReportsView extends ReportsViewBase implements View{
+public class ReportsView extends ReportsViewBase implements View {
 
 	public static final int SLIDER_NOSELECTION = 100;
 	public static final int SLIDER_SINGLESELECTION = 52;
 	public static final int SLIDER_MULTISELECTION = 78;
-	
+
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
-	
-	
+
 	public ReportsView(ReportsModel m) {
 		super();
 		model = m;
@@ -40,12 +38,12 @@ public class ReportsView extends ReportsViewBase implements View{
 		initializeUIComponents();
 		initializeBinder();
 	}
-	
+
 	@Override
 	public void enter(ViewChangeEvent event) {
 		init();
 	}
-	
+
 	public void init() {
 		btnUser.setCaption(BaseModel.loginUser.getName());
 		refreshComboboxContent();
@@ -61,17 +59,18 @@ public class ReportsView extends ReportsViewBase implements View{
 		cmbEditStatus.setItems(model.getStatuses());
 		cmbEditAssignedTo.setItems(model.findReporters());
 	}
-	
+
 	private void initializeGrid() {
 		gridReports.removeAllColumns();
 		gridReports.addColumn("priority").setCaption("PRIORITY").setExpandRatio(1);
-		gridReports.addColumn(report -> StringUtil.converToCamelCaseString(report.getType().toString())).setCaption("TYPE").setExpandRatio(1);
+		gridReports.addColumn(report -> StringUtil.converToCamelCaseString(report.getType().toString()))
+				.setCaption("TYPE").setExpandRatio(1);
 		gridReports.addColumn("summary").setCaption("SUMMARY").setExpandRatio(5);
 		gridReports.addColumn("assigned").setCaption("ASSIGNED TO").setExpandRatio(2);
 		gridReports.addColumn("timestamp", new FineDateRenderer()).setCaption("LAST MODIFIED").setExpandRatio(2);
 		gridReports.addColumn("reportedTimestamp", new FineDateRenderer()).setCaption("REPORTED").setExpandRatio(2);
 	}
-	
+
 	private void initializeUIComponents() {
 		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
 		cmbVersion.addSelectionListener(evt -> processVersionChange());
@@ -91,9 +90,9 @@ public class ReportsView extends ReportsViewBase implements View{
 		binder.bind(cmbEditAssignedTo, Report::getAssigned, Report::setAssigned);
 		binder.bind(cmbEditVersion, Report::getVersion, Report::setVersion);
 	}
-	
+
 	private void fillComments() {
-		VerticalLayout layout = (VerticalLayout)pnlThreadComments.getContent();
+		VerticalLayout layout = (VerticalLayout) pnlThreadComments.getContent();
 		layout.removeAllComponents();
 		List<Comment> comments = model.getComments();
 		for (Comment comment : comments) {
@@ -107,7 +106,7 @@ public class ReportsView extends ReportsViewBase implements View{
 		cmbVersion.setSelectedItem(versions.get(0));
 		cmbEditVersion.setItems(versions);
 	}
-	
+
 	private void processVersionChange() {
 		refreshGridContent();
 	}
@@ -149,7 +148,7 @@ public class ReportsView extends ReportsViewBase implements View{
 			Notification.show("Saved successfully", Type.TRAY_NOTIFICATION);
 			refreshGridContent();
 		} catch (ValidationException e) {
-			Notification.show("Missing information, "+e.getMessage(), Type.ERROR_MESSAGE);
+			Notification.show("Missing information, " + e.getMessage(), Type.ERROR_MESSAGE);
 		}
 	}
 
@@ -157,15 +156,15 @@ public class ReportsView extends ReportsViewBase implements View{
 		model.resetReportForEdit();
 		binder.setBean(model.getReportForEdit());
 	}
-	
+
 	private void openReportDetail() {
 		Window window = new Window();
-		window.setCaption(String.format("%s > %s", model.getReportForEdit().getProject().getName(), model.getReportForEdit().getVersion().getVersion()));
+		Report report = model.getReportForEdit();
+		window.setCaption(String.format("%s > %s", report.getProject().getName(), report.getVersion().getVersion()));
 		window.setSizeFull();
-		
+
 		ReportDetailView view = new ReportDetailView(model);
 		window.setContent(view);
-		
 		getUI().addWindow(window);
 	}
 }

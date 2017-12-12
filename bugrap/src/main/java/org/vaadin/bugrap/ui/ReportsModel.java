@@ -97,6 +97,9 @@ public class ReportsModel extends BaseModel {
 		return getRepository().findReporters();
 	}
 
+	public List<ProjectVersion> findProjectVersions() {
+		return findProjectVersions(reportForEdit.getProject());
+	}
 	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(project));
