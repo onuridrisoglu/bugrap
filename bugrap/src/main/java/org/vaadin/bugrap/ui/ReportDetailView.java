@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Report;
 import org.vaadin.bugrap.ui.generated.ReportDetailViewBase;
@@ -111,7 +110,7 @@ public class ReportDetailView extends ReportDetailViewBase
 
 	private void saveComment() {
 		if (!txtComment.isEmpty())
-			model.saveComment(txtComment.getValue(), BaseModel.loginUser);
+			model.saveComment(txtComment.getValue());
 		model.saveAttachments();
 		fillComments();
 		cleanAttachments();

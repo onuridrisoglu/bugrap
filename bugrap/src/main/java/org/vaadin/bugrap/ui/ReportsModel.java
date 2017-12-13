@@ -26,6 +26,7 @@ import org.vaadin.bugrap.util.ReportUtil;
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DownloadStream;
+import com.vaadin.server.VaadinSession;
 
 public class ReportsModel extends BaseModel {
 
@@ -40,8 +41,8 @@ public class ReportsModel extends BaseModel {
 	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
 
-	public ReportsModel(Navigator navigator) {
-		super(navigator);
+	public ReportsModel(Navigator navigator, VaadinSession session) {
+		super(navigator, session);
 	}
 
 	public List<Report> getSelectedReports() {
@@ -160,11 +161,11 @@ public class ReportsModel extends BaseModel {
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
 
-	public void saveComment(String commentTxt, Reporter author) {
+	public void saveComment(String commentTxt) {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
 		comment.setComment(commentTxt);
-		comment.setAuthor(author);
+		comment.setAuthor(getLoginUser());
 		comment.setTimestamp(new Date());
 		comment.setType(Comment.Type.COMMENT);
 		getRepository().save(comment);
@@ -175,7 +176,7 @@ public class ReportsModel extends BaseModel {
 		comment.setReport(reportForEdit);
 		comment.setAttachment(stream.getStream().readAllBytes());
 		comment.setAttachmentName(filename);
-		comment.setAuthor(BaseModel.loginUser);
+		comment.setAuthor(getLoginUser());
 		comment.setTimestamp(new Date());
 		comment.setType(Comment.Type.ATTACHMENT);
 		return comment;

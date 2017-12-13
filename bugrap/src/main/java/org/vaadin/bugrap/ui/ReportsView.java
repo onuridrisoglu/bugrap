@@ -3,7 +3,6 @@ package org.vaadin.bugrap.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
@@ -46,7 +45,7 @@ public class ReportsView extends ReportsViewBase implements View {
 	}
 
 	public void init() {
-		btnUser.setCaption(BaseModel.loginUser.getName());
+		btnUser.setCaption(model.getLoginUser().getName());
 		refreshComboboxContent();
 	}
 
