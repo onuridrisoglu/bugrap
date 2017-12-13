@@ -25,6 +25,7 @@ import org.vaadin.bugrap.util.ReportUtil;
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DownloadStream;
+import com.vaadin.ui.ProgressBar;
 
 public class ReportsModel extends BaseModel {
 
@@ -36,7 +37,7 @@ public class ReportsModel extends BaseModel {
 
 	private List<Report> selectedReports = new ArrayList<Report>();
 	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
-	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
+//	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
 
 	public ReportsModel(Navigator navigator) {
@@ -60,10 +61,6 @@ public class ReportsModel extends BaseModel {
 			return SELECTIONMODE_SINGLE;
 		else
 			return SELECTIONMODE_MULTI;
-	}
-
-	public Map<String, Object> getUploadingUIElements() {
-		return uploadingUIElements;
 	}
 
 	public List<Comment> getUploadedFilesToSave() {
