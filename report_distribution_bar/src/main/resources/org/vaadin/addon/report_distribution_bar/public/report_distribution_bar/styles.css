@@ -1,0 +1,26 @@
+div.report{
+	padding: 5px;
+	min-width: 30px;
+    font-size: small;
+}
+div.first {
+	border-bottom-left-radius: 10px;
+	border-top-left-radius: 10px;
+}
+div.last {
+	border-bottom-right-radius: 10px;
+	border-top-right-radius: 10px;
+}
+div.closed {
+	background-color: rgb(80, 80, 80);
+    color: whitesmoke ;
+}
+
+div.assigned {
+	background-color: rgb(120, 120, 120);
+    color: whitesmoke ;
+}
+
+div.unassigned {
+	background-color: rgb(160, 160, 160);
+}
