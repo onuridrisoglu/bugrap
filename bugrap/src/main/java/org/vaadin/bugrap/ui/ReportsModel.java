@@ -169,6 +169,7 @@ public class ReportsModel extends BaseModel {
 		getRepository().save(comment);
 	}
 
+
 	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
@@ -191,4 +192,5 @@ public class ReportsModel extends BaseModel {
 		}
 		uploadedFilesToSave.clear();
 	}
+  
 }

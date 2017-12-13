@@ -17,6 +17,8 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.ClientConnector.AttachListener;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
@@ -80,7 +82,8 @@ public class ReportsView extends ReportsViewBase implements View {
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> onReportSelected(evt));
-		btnReportSummary.addClickListener(evt -> openReportDetail());
+		
+    btnReportSummary.addClickListener(evt -> openReportDetail());
 	}
 
 	private void initializeBinder() {
