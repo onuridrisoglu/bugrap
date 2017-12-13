@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;GENERATE_GETTERS&quot;:false,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;valo&quot;}">
   <meta name="vaadin-version" content="8.0.5">
+  <meta name="package-mapping" content="org_vaadin_addon_report_distribution_bar:org.vaadin.addon.report_distribution_bar">
   <meta name="package-mapping" content="org_vaadin_peter_buttongroup:org.vaadin.peter.buttongroup">
  </head>
  <body>
@@ -39,6 +40,7 @@
       <vaadin-form-layout size-auto margin="false">
        <vaadin-combo-box caption="Reports for" empty-selection-allowed="false" style-name="borderless small" data-item-type="org.vaadin.bugrap.domain.entities.ProjectVersion" data-property-id="version" _id="cmbVersion"></vaadin-combo-box>
       </vaadin-form-layout>
+      <org_vaadin_addon_report_distribution_bar-report-distribution-bar width-full _id="distributionBar" :expand></org_vaadin_addon_report_distribution_bar-report-distribution-bar>
      </vaadin-horizontal-layout>
      <vaadin-horizontal-layout size-full>
       <vaadin-grid size-full data-item-type="org.vaadin.bugrap.domain.entities.Report" selection-mode="multi" _id="gridReports">

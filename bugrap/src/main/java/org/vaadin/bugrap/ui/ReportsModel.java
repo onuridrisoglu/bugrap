@@ -20,6 +20,7 @@ import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
+import org.vaadin.bugrap.ui.beans.ReportDistribution;
 import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
@@ -190,5 +191,13 @@ public class ReportsModel extends BaseModel {
 			getRepository().save(attachment);
 		}
 		uploadedFilesToSave.clear();
+	}
+	
+	public ReportDistribution getReportDistribution(ProjectVersion version) {
+		ReportDistribution distribution = new ReportDistribution();
+		distribution.setClosedReports(getRepository().countClosedReports(version));
+		distribution.setAssignedReports(getRepository().countOpenedReports(version));
+		distribution.setUnassignedReports(getRepository().countUnassignedReports(version));
+		return distribution;
 	}
 }

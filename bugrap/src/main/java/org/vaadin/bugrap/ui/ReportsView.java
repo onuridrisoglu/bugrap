@@ -8,6 +8,7 @@ import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.ui.beans.ReportDistribution;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
 import org.vaadin.bugrap.ui.generated.ReportsViewBase;
 import org.vaadin.bugrap.util.StringUtil;
@@ -74,8 +75,6 @@ public class ReportsView extends ReportsViewBase implements View {
 	private void initializeUIComponents() {
 		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
 		cmbVersion.addSelectionListener(evt -> processVersionChange());
-		cmbProjectFilter.addSelectionListener(evt -> processProjectChange());
-		cmbVersion.addSelectionListener(evt -> processVersionChange());
 		btnUpdateReport.addClickListener(evt -> saveReport());
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
@@ -109,6 +108,7 @@ public class ReportsView extends ReportsViewBase implements View {
 
 	private void processVersionChange() {
 		refreshGridContent();
+		refreshDistributionBar();
 	}
 
 	private void refreshGridContent() {
@@ -118,6 +118,11 @@ public class ReportsView extends ReportsViewBase implements View {
 		for (Report report : selectedReports) {
 			gridReports.select(report);
 		}
+	}
+	
+	private void refreshDistributionBar() {
+		ReportDistribution distribution = model.getReportDistribution(cmbVersion.getValue());
+		distributionBar.setDistributions(distribution.getClosedReports(), distribution.getAssignedReports(), distribution.getUnassignedReports());
 	}
 
 	private void onReportSelected(SelectionEvent<Report> evt) {
