@@ -42,6 +42,56 @@
       </vaadin-form-layout>
       <org_vaadin_addon_report_distribution_bar-report-distribution-bar width-full _id="distributionBar" :expand></org_vaadin_addon_report_distribution_bar-report-distribution-bar>
      </vaadin-horizontal-layout>
+     <vaadin-horizontal-layout>
+      <vaadin-form-layout size-auto margin="false">
+       <vaadin-menu-bar caption="Assignees" style-name="small" _id="menuAssignees">
+        <menu checkable>
+          Only me 
+        </menu>
+        <menu checkable>
+          Everyone 
+        </menu>
+       </vaadin-menu-bar>
+      </vaadin-form-layout>
+      <vaadin-form-layout size-auto margin-left margin-top="false" margin-bottom="false">
+       <vaadin-menu-bar caption="Status" style-name="small" _id="menuStatus">
+        <menu checkable>
+          Open 
+        </menu>
+        <menu checkable>
+          All kinds 
+        </menu>
+        <menu>
+          Custom 
+         <menu checkable>
+           Open 
+         </menu>
+         <menu separator></menu>
+         <menu checkable>
+           Fixed 
+         </menu>
+         <menu checkable>
+           Invalid 
+         </menu>
+         <menu checkable>
+           Won't fix 
+         </menu>
+         <menu checkable>
+           Can't fix 
+         </menu>
+         <menu checkable>
+           Duplicate 
+         </menu>
+         <menu checkable>
+           Works for me 
+         </menu>
+         <menu checkable>
+           Needs more information 
+         </menu>
+        </menu>
+       </vaadin-menu-bar>
+      </vaadin-form-layout>
+     </vaadin-horizontal-layout>
      <vaadin-horizontal-layout size-full>
       <vaadin-grid size-full data-item-type="org.vaadin.bugrap.domain.entities.Report" selection-mode="multi" _id="gridReports">
        <table>

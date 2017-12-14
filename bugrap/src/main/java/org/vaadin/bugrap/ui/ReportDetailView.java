@@ -78,7 +78,7 @@ public class ReportDetailView extends ReportDetailViewBase
 	private void initializeComboContents() {
 		cmbEditPriority.setItems(model.getPriorties());
 		cmbEditType.setItems(model.getTypes());
-		cmbEditStatus.setItems(model.getStatuses());
+		cmbEditStatus.setItems(model.getAllStatuses());
 		cmbEditAssignedTo.setItems(model.findReporters());
 		cmbEditVersion.setItems(model.findProjectVersions());
 	}

@@ -1,12 +1,14 @@
 package org.vaadin.bugrap.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.ui.beans.ReportDistribution;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
 import org.vaadin.bugrap.ui.generated.ReportsViewBase;
@@ -17,6 +19,7 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
@@ -27,7 +30,23 @@ public class ReportsView extends ReportsViewBase implements View {
 	public static final int SLIDER_NOSELECTION = 100;
 	public static final int SLIDER_SINGLESELECTION = 52;
 	public static final int SLIDER_MULTISELECTION = 78;
+	
+	public static final int MENUBARIDX_ASSIGNEE_ME = 0;
+	public static final int MENUBARIDX_ASSIGNEE_ALL = 1;
 
+	public static final int MENUBARIDX_STATUS_OPEN = 0;
+	public static final int MENUBARIDX_STATUS_ALL = 1;
+	public static final int MENUBARIDX_STATUS_CUSTOM = 2;
+
+	public static final int MENUBARIDX_CUSTOMSTATUS_OPEN = 0;
+	public static final int MENUBARIDX_CUSTOMSTATUS_FIXED = 2;
+	public static final int MENUBARIDX_CUSTOMSTATUS_INVALID = 3;
+	public static final int MENUBARIDX_CUSTOMSTATUS_WONTFIX = 4;
+	public static final int MENUBARIDX_CUSTOMSTATUS_CANTFIX = 5;
+	public static final int MENUBARIDX_CUSTOMSTATUS_DUPLICATE = 6;
+	public static final int MENUBARIDX_CUSTOMSTATUS_WORKS4ME = 7;
+	public static final int MENUBARIDX_CUSTOMSTATUS_NEEDSINFO = 8;
+	
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
 
@@ -37,6 +56,7 @@ public class ReportsView extends ReportsViewBase implements View {
 		initializeGrid();
 		initializeUIComponents();
 		initializeBinder();
+		initializeMenuBars();
 	}
 
 	@Override
@@ -45,8 +65,65 @@ public class ReportsView extends ReportsViewBase implements View {
 	}
 
 	public void init() {
+		model.setStatusFilters(Status.values());
+		drawAssigneeMenubarFromModel();
+		drawStatusMenubarFromModel();
+		
 		btnUser.setCaption(model.getLoginUser().getName());
 		refreshComboboxContent();
+	}
+
+	private void initializeMenuBars() {
+		menuAssignees.getItems().get(MENUBARIDX_ASSIGNEE_ME).setCommand(evt -> onAssigneeFilterSelected(ReportsModel.ASSIGNEE_ME));
+		menuAssignees.getItems().get(MENUBARIDX_ASSIGNEE_ALL).setCommand(evt -> onAssigneeFilterSelected(ReportsModel.ASSIGNEE_ALL));
+		
+		menuStatus.getItems().get(MENUBARIDX_STATUS_OPEN).setCommand(evt -> onStatusFilterSelected(true, true, Status.OPEN));
+		menuStatus.getItems().get(MENUBARIDX_STATUS_ALL).setCommand(evt -> onStatusFilterSelected(true, true, Status.values()));
+		
+		MenuItem customStatusMenuItem = menuStatus.getItems().get(MENUBARIDX_STATUS_CUSTOM);
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_OPEN).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.OPEN));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_CANTFIX).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.CANT_FIX));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_DUPLICATE).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.DUPLICATE));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_FIXED).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.FIXED));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_INVALID).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.INVALID));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_NEEDSINFO).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.NEED_MORE_INFO));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_WONTFIX).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.WONT_FIX));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_WORKS4ME).setCommand(evt -> onStatusFilterSelected(false, evt.isChecked(), Status.WORKS_FOR_ME));
+	}
+
+	private void onAssigneeFilterSelected(int mode) {
+		model.setAssigneeFilterMode(mode);
+		drawAssigneeMenubarFromModel();
+		refreshGridContent();
+	}
+
+	private void onStatusFilterSelected(boolean isSetMode, boolean isChecked, Status...status) {
+		if (isSetMode)
+			model.setStatusFilters(status);
+		else
+			model.changeStatusFilters(isChecked, status);
+		drawStatusMenubarFromModel();
+		refreshGridContent();
+	}
+	
+	private void drawAssigneeMenubarFromModel() {
+		menuAssignees.getItems().get(MENUBARIDX_ASSIGNEE_ME).setChecked(model.getAssigneeFilterMode() == ReportsModel.ASSIGNEE_ME);
+		menuAssignees.getItems().get(MENUBARIDX_ASSIGNEE_ALL).setChecked(model.getAssigneeFilterMode() == ReportsModel.ASSIGNEE_ALL);
+	}
+
+	private void drawStatusMenubarFromModel() {
+		menuStatus.getItems().get(MENUBARIDX_STATUS_OPEN).setChecked(model.getStatusFilter().size() == 1 && model.getStatusFilter().contains(Status.OPEN));
+		menuStatus.getItems().get(MENUBARIDX_STATUS_ALL).setChecked(model.getStatusFilter().containsAll(Arrays.asList(Status.values())));
+		
+		MenuItem customStatusMenuItem = menuStatus.getItems().get(MENUBARIDX_STATUS_CUSTOM);
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_OPEN).setChecked(model.getStatusFilter().contains(Status.OPEN));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_CANTFIX).setChecked(model.getStatusFilter().contains(Status.CANT_FIX));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_DUPLICATE).setChecked(model.getStatusFilter().contains(Status.DUPLICATE));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_FIXED).setChecked(model.getStatusFilter().contains(Status.FIXED));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_INVALID).setChecked(model.getStatusFilter().contains(Status.INVALID));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_NEEDSINFO).setChecked(model.getStatusFilter().contains(Status.NEED_MORE_INFO));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_WONTFIX).setChecked(model.getStatusFilter().contains(Status.WONT_FIX));
+		customStatusMenuItem.getChildren().get(MENUBARIDX_CUSTOMSTATUS_WORKS4ME).setChecked(model.getStatusFilter().contains(Status.WORKS_FOR_ME));
 	}
 
 	private void refreshComboboxContent() {
@@ -56,7 +133,7 @@ public class ReportsView extends ReportsViewBase implements View {
 		cmbEditPriority.setItems(model.getPriorties());
 		cmbEditType.setItems(model.getTypes());
 		cmbEditType.setItemCaptionGenerator(type -> StringUtil.converToCamelCaseString(type.name()));
-		cmbEditStatus.setItems(model.getStatuses());
+		cmbEditStatus.setItems(model.getAllStatuses());
 		cmbEditAssignedTo.setItems(model.findReporters());
 	}
 
