@@ -8,9 +8,11 @@ import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.ui.beans.ReportDistribution;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
+import org.vaadin.bugrap.ui.columns.PriorityColumnRenderer;
 import org.vaadin.bugrap.ui.generated.ReportsViewBase;
 import org.vaadin.bugrap.util.StringUtil;
 
@@ -24,6 +26,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.renderers.AbstractRenderer;
+import com.vaadin.ui.renderers.HtmlRenderer;
+
+import elemental.json.JsonType;
+import elemental.json.JsonValue;
 
 public class ReportsView extends ReportsViewBase implements View {
 
@@ -139,7 +146,7 @@ public class ReportsView extends ReportsViewBase implements View {
 
 	private void initializeGrid() {
 		gridReports.removeAllColumns();
-		gridReports.addColumn("priority").setCaption("PRIORITY").setExpandRatio(1);
+		gridReports.addColumn(report -> PriorityColumnRenderer.getHtmlForPriority(report.getPriority()), new HtmlRenderer()).setCaption("PRIORITY").setExpandRatio(1);
 		gridReports.addColumn(report -> StringUtil.converToCamelCaseString(report.getType().toString()))
 				.setCaption("TYPE").setExpandRatio(1);
 		gridReports.addColumn("summary").setCaption("SUMMARY").setExpandRatio(5);
@@ -164,6 +171,8 @@ public class ReportsView extends ReportsViewBase implements View {
 		binder.bind(cmbEditStatus, Report::getStatus, Report::setStatus);
 		binder.bind(cmbEditAssignedTo, Report::getAssigned, Report::setAssigned);
 		binder.bind(cmbEditVersion, Report::getVersion, Report::setVersion);
+		
+		
 	}
 
 	private void fillComments() {

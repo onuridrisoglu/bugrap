@@ -34,5 +34,10 @@
 @mixin mytheme {
   @include valo;
 
-  // Insert your own theme rules here
+	div.bar{
+	    background-color: gray;
+	    height: 20px;
+	    width: 10px;
+	    vertical-align: center;
+	}
 }
