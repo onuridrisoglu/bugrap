@@ -1,11 +1,14 @@
 package org.vaadin.bugrap.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
@@ -21,20 +24,26 @@ import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.DownloadStream;
+import com.vaadin.ui.ProgressBar;
 
-public class ReportsModel extends BaseModel{
+public class ReportsModel extends BaseModel {
 
 	public static final int SELECTIONMODE_NONE = 0;
 	public static final int SELECTIONMODE_SINGLE = 1;
 	public static final int SELECTIONMODE_MULTI = 2;
-	
+
+	public static final String FILEUPLOAD_PATH = "/Users/onuridrisoglu/Downloads/temp/";
+
 	private List<Report> selectedReports = new ArrayList<Report>();
+	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
+//	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
-	
+
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
 	}
-	
+
 	public List<Report> getSelectedReports() {
 		return selectedReports;
 	}
@@ -44,7 +53,7 @@ public class ReportsModel extends BaseModel{
 		selectedReports.addAll(reports);
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
-	
+
 	public int getSelectionMode() {
 		if (selectedReports == null || selectedReports.size() == 0)
 			return SELECTIONMODE_NONE;
@@ -53,6 +62,14 @@ public class ReportsModel extends BaseModel{
 		else
 			return SELECTIONMODE_MULTI;
 	}
+
+	public List<Comment> getUploadedFilesToSave() {
+		return uploadedFilesToSave;
+	}
+
+	public void setUploadedFilesToSave(List<Comment> uploadedFilesToSave) {
+		this.uploadedFilesToSave = uploadedFilesToSave;
+	}
 	
 	public List<Project> findProjects() {
 		List<Project> projects = new ArrayList<Project>();
@@ -60,42 +77,47 @@ public class ReportsModel extends BaseModel{
 		Collections.sort(projects);
 		return projects;
 	}
-	
+
 	public Collection<Priority> getPriorties() {
 		return Arrays.asList(Priority.values());
 	}
+
 	public Collection<Type> getTypes() {
 		return Arrays.asList(Type.values());
 	}
+
 	public Collection<Status> getStatuses() {
 		return Arrays.asList(Status.values());
 	}
-	
+
 	public Collection<Reporter> findReporters() {
 		return getRepository().findReporters();
 	}
-	
+
+	public List<ProjectVersion> findProjectVersions() {
+		return findProjectVersions(reportForEdit.getProject());
+	}
 	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(project));
 		Collections.sort(projectVersions);
 		return projectVersions;
 	}
-	
-	public Collection<Report> findReports(Project project, ProjectVersion version){
+
+	public Collection<Report> findReports(Project project, ProjectVersion version) {
 		ReportsQuery query = new ReportsQuery();
 		query.project = project;
 		query.projectVersion = version;
 		return getRepository().findReports(query);
 	}
-	
+
 	public void saveReport() throws ValidationException {
 		for (Report report : selectedReports) {
 			ReportUtil.setFields(report, reportForEdit);
 			getRepository().save(report);
 		}
 	}
-	
+
 	public void save() {
 		Report report = getReportById(reportForEdit.getId());
 		ReportUtil.setFields(report, reportForEdit);
@@ -108,8 +130,8 @@ public class ReportsModel extends BaseModel{
 
 	public List<Comment> getComments() {
 		List<Comment> comments = new ArrayList<Comment>();
-		if (getSelectionMode() != SELECTIONMODE_SINGLE) 
-			return comments; //No need to display comments if selection mode is not single
+		if (getSelectionMode() != SELECTIONMODE_SINGLE)
+			return comments; // No need to display comments if selection mode is not single
 		comments.add(createCommentFromReportDescription(reportForEdit));
 		comments.addAll(getRepository().findComments(reportForEdit));
 		return comments;
@@ -126,7 +148,6 @@ public class ReportsModel extends BaseModel{
 		return comment;
 	}
 
-	
 	public Report getReportForEdit() {
 		return reportForEdit;
 	}
@@ -134,7 +155,7 @@ public class ReportsModel extends BaseModel{
 	public void resetReportForEdit() {
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
-	
+
 	public void saveComment(String commentTxt, Reporter author) {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
@@ -145,22 +166,28 @@ public class ReportsModel extends BaseModel{
 		getRepository().save(comment);
 	}
 
-	public String getSelectedReportsText() {
-		StringBuilder builder = new StringBuilder();
-		for (Report report : selectedReports) {
-			if (builder.length() > 0)
-				builder.append(",");
-			builder.append(report.getId());
-		}
-		return builder.toString();
+
+	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
+		Comment comment = new Comment();
+		comment.setReport(reportForEdit);
+		comment.setAttachment(stream.getStream().readAllBytes());
+		comment.setAttachmentName(filename);
+		comment.setAuthor(BaseModel.loginUser);
+		comment.setTimestamp(new Date());
+		comment.setType(Comment.Type.ATTACHMENT);
+		return comment;
 	}
 
-	public void setSelectedReportsFromText(String selectedReportsText) {
-		String[] reportIds = selectedReportsText.split(",");
-		selectedReports.clear();
-		for (String id : reportIds) {
-			selectedReports.add(getReportById(Long.parseLong(id)));
-		}
-		resetReportForEdit();
+	public void attachFile(String filename, String mimeType, DownloadStream stream) throws IOException {
+		Comment attachmentComment = createComment(filename, mimeType, stream);
+		uploadedFilesToSave.add(attachmentComment);
 	}
+
+	public void saveAttachments() {
+		for (Comment attachment : uploadedFilesToSave) {
+			getRepository().save(attachment);
+		}
+		uploadedFilesToSave.clear();
+	}
+  
 }
