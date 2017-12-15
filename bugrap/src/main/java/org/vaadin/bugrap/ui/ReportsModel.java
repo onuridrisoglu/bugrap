@@ -6,10 +6,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.vaadin.bugrap.BaseModel;
@@ -43,7 +41,7 @@ public class ReportsModel extends BaseModel {
 
 	private List<Report> selectedReports = new ArrayList<Report>();
 	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
-	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
+//	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
 
 	private int assigneeFilterMode = ASSIGNEE_ALL;
@@ -70,10 +68,6 @@ public class ReportsModel extends BaseModel {
 			return SELECTIONMODE_SINGLE;
 		else
 			return SELECTIONMODE_MULTI;
-	}
-
-	public Map<String, Object> getUploadingUIElements() {
-		return uploadingUIElements;
 	}
 
 	public List<Comment> getUploadedFilesToSave() {
@@ -180,6 +174,7 @@ public class ReportsModel extends BaseModel {
 		comment.setType(Comment.Type.COMMENT);
 		getRepository().save(comment);
 	}
+
 
 	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
 		Comment comment = new Comment();

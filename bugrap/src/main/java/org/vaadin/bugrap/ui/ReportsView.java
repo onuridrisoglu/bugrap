@@ -8,7 +8,6 @@ import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Project;
 import org.vaadin.bugrap.domain.entities.ProjectVersion;
 import org.vaadin.bugrap.domain.entities.Report;
-import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.ui.beans.ReportDistribution;
 import org.vaadin.bugrap.ui.columns.FineDateRenderer;
@@ -26,11 +25,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.renderers.AbstractRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
-
-import elemental.json.JsonType;
-import elemental.json.JsonValue;
 
 public class ReportsView extends ReportsViewBase implements View {
 
@@ -162,7 +157,8 @@ public class ReportsView extends ReportsViewBase implements View {
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnLogout.addClickListener(evt -> model.logout());
 		gridReports.addSelectionListener(evt -> onReportSelected(evt));
-		btnReportSummary.addClickListener(evt -> openReportDetail());
+		
+    btnReportSummary.addClickListener(evt -> openReportDetail());
 	}
 
 	private void initializeBinder() {

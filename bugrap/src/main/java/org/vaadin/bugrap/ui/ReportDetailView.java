@@ -33,6 +33,7 @@ public class ReportDetailView extends ReportDetailViewBase
 
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
+	private ProgressBar uploadInProgress;
 
 	public ReportDetailView(ReportsModel reportModel) {
 		model = reportModel;
@@ -122,15 +123,16 @@ public class ReportDetailView extends ReportDetailViewBase
 		HorizontalLayout layout = (HorizontalLayout) pnlAttachments.getContent();
 		ProgressBar progress = new ProgressBar();
 		progress.setCaption(event.getFilename());
-		model.getUploadingUIElements().put(event.getFilename(), progress);
+		uploadInProgress = progress;
 		layout.addComponent(progress);
+		btnDone.setEnabled(false);//disable done button until upload completes
 	}
 
 	@Override
 	public void uploadSucceeded(SucceededEvent event) {
-		ProgressBar progress = (ProgressBar) model.getUploadingUIElements().remove(event.getFilename());
 		HorizontalLayout layout = (HorizontalLayout) pnlAttachments.getContent();
-		layout.removeComponent(progress);
+		layout.removeComponent(uploadInProgress);
+		uploadInProgress = null;
 		FileResource file = new FileResource(new File(ReportsModel.FILEUPLOAD_PATH + event.getFilename()));
 		try {
 			model.attachFile(event.getFilename(), event.getMIMEType(), file.getStream());
@@ -160,12 +162,8 @@ public class ReportDetailView extends ReportDetailViewBase
 
 	@Override
 	public void updateProgress(long readBytes, long contentLength) {
-		ProgressBar bar = null;
-		for (Object obj : model.getUploadingUIElements().values()) {
-			bar = (ProgressBar) obj;
-		}
-		if (bar != null)
-			bar.setValue(((float) readBytes) / contentLength);
+		if (uploadInProgress != null)
+			uploadInProgress.setValue(((float) readBytes) / contentLength);
 	}
 
 	private void closeWindow() {
