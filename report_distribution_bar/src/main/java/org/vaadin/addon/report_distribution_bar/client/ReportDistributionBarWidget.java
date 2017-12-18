@@ -12,6 +12,8 @@ public class ReportDistributionBarWidget extends Composite {
 	private Label unassignedLabel = new Label("");
 	private HorizontalPanel panel = new HorizontalPanel();
 	
+	public static final int PROGRESSBAR_WIDTH_MULTIPLIER = 90; //Intentionally set to 90%, in order to give some room to the 0 length items 
+	
     public ReportDistributionBarWidget() {
 	    	initWidget(panel);
 
@@ -41,7 +43,7 @@ public class ReportDistributionBarWidget extends Composite {
 	}
 
 	private String getWidth(long num, long denom) {
-		long width = (num * 90)/denom;
+		long width = (num * PROGRESSBAR_WIDTH_MULTIPLIER)/denom;
 		return width + "%";
 	}
 }
