@@ -17,6 +17,9 @@
        <vaadin-button icon="fonticon://Vaadin-Icons/e80d" style-name="quiet small" plain-text _id="btnUser">
          User 
        </vaadin-button>
+       <vaadin-label plain-text>
+         | 
+       </vaadin-label>
        <vaadin-button icon="fonticon://Vaadin-Icons/e6ac" style-name="quiet small" plain-text _id="btnLogout">
          Logout 
        </vaadin-button>
@@ -27,20 +30,26 @@
        <vaadin-button icon="fonticon://Vaadin-Icons/e68b" style-name="quiet small" plain-text _id="btnCreateBug">
          Report a bug 
        </vaadin-button>
+       <vaadin-label plain-text>
+         | 
+       </vaadin-label>
        <vaadin-button icon="fonticon://Vaadin-Icons/e6ae" style-name="quiet small" plain-text _id="btnRequestFeature">
          Request a feature 
        </vaadin-button>
+       <vaadin-label plain-text>
+         | 
+       </vaadin-label>
        <vaadin-button icon="fonticon://Vaadin-Icons/e686" style-name="quiet small" plain-text icon-alt="sss" _id="btnManageProject">
          Manage project 
        </vaadin-button>
       </vaadin-css-layout>
-      <vaadin-text-field icon="fonticon://Vaadin-Icons/e805" style-name="small inline-icon" placeholder="Search reports..." width-full _id="txtReportFilter" :middle :right></vaadin-text-field>
+      <vaadin-text-field icon="fonticon://Vaadin-Icons/e805" style-name="small inline-icon" placeholder="Search reports..." width-full _id="txtReportFilter" :center></vaadin-text-field>
      </vaadin-horizontal-layout>
-     <vaadin-horizontal-layout width-full>
+     <vaadin-horizontal-layout width-full :center>
       <vaadin-form-layout size-auto margin="false">
        <vaadin-combo-box caption="Reports for" empty-selection-allowed="false" style-name="borderless small" data-item-type="org.vaadin.bugrap.domain.entities.ProjectVersion" data-property-id="version" _id="cmbVersion"></vaadin-combo-box>
       </vaadin-form-layout>
-      <org_vaadin_addon_report_distribution_bar-report-distribution-bar width-full _id="distributionBar" :expand></org_vaadin_addon_report_distribution_bar-report-distribution-bar>
+      <org_vaadin_addon_report_distribution_bar-report-distribution-bar width-full _id="distributionBar" :middle :center :expand></org_vaadin_addon_report_distribution_bar-report-distribution-bar>
      </vaadin-horizontal-layout>
      <vaadin-horizontal-layout>
       <vaadin-form-layout size-auto margin="false">

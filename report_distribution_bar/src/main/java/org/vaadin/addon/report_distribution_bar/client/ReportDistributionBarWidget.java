@@ -41,7 +41,7 @@ public class ReportDistributionBarWidget extends Composite {
 	}
 
 	private String getWidth(long num, long denom) {
-		long width = (num * 100)/denom;
+		long width = (num * 90)/denom;
 		return width + "%";
 	}
 }
