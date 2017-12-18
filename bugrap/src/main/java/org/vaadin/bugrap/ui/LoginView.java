@@ -8,10 +8,10 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
-public class LoginView extends LoginViewBase implements View{
-	
+public class LoginView extends LoginViewBase implements View {
+
 	private LoginModel model;
-	
+
 	public LoginView(LoginModel m) {
 		super();
 		model = m;
@@ -22,20 +22,24 @@ public class LoginView extends LoginViewBase implements View{
 
 	@Override
 	public void enter(ViewChangeEvent event) {
-		if (model.getLoginUser() != null)
-			model.login(username.getValue(), password.getValue());
 		clearFields();
+		if (model.getLoginUser() != null) {
+			model.navigateToReports();
+		}
 	}
-	
+
 	private void clearFields() {
 		username.clear();
 		password.clear();
 		username.focus();
 	}
-	
+
 	private void login() {
-		boolean isAuthenticated = model.login(username.getValue(), password.getValue());
-		if (!isAuthenticated)
+		boolean isAuthenticated = model.authenticate(username.getValue(), password.getValue());
+		if (isAuthenticated) {
+			model.navigateToReports();
+		} else {
 			Notification.show("Authentication failed, please check your credentials", Type.WARNING_MESSAGE);
+		}
 	}
 }

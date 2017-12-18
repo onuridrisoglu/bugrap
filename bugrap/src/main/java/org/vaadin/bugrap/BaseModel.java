@@ -12,17 +12,15 @@ public class BaseModel {
 
 	public static final String NAV_LOGIN = "login";
 	public static final String NAV_REPORT = "report";
-	
+
 	private static final String SESSIONVAR_LOGINUSER = "loginuser";
 	private static final String SESSIONVAR_LASTSELECTEDVERSION = "lastselectedversionforproject";
 
 	private static final BugrapRepository repository = new BugrapRepository(DatabaseHelper.DB_LOCATION);
 	private Navigator navigator;
-	private VaadinSession session;
 
-	public BaseModel(Navigator nav, VaadinSession vs) {
+	public BaseModel(Navigator nav) {
 		navigator = nav;
-		session = vs;
 	}
 
 	protected static BugrapRepository getRepository() {
@@ -37,11 +35,11 @@ public class BaseModel {
 		setSessionVariable(SESSIONVAR_LOGINUSER, null);
 		navigator.navigateTo(NAV_LOGIN);
 	}
-	
+
 	public Reporter getLoginUser() {
-		return (Reporter)getSessionVariable(SESSIONVAR_LOGINUSER);
+		return (Reporter) getSessionVariable(SESSIONVAR_LOGINUSER);
 	}
-	
+
 	public void setLoginUser(Reporter user) {
 		setSessionVariable(SESSIONVAR_LOGINUSER, user);
 	}
@@ -55,10 +53,10 @@ public class BaseModel {
 	}
 	
 	private Object getSessionVariable(String key) {
-		return session.getAttribute(key);
+		return VaadinSession.getCurrent().getAttribute(key);
 	}
-	
+
 	private void setSessionVariable(String key, Object var) {
-		session.setAttribute(key, var);
+		VaadinSession.getCurrent().setAttribute(key, var);
 	}
 }

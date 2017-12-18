@@ -26,15 +26,14 @@ import org.vaadin.bugrap.util.ReportUtil;
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DownloadStream;
-import com.vaadin.server.VaadinSession;
 
 public class ReportsModel extends BaseModel {
 
 	public static final int SELECTIONMODE_NONE = 0;
 	public static final int SELECTIONMODE_SINGLE = 1;
 	public static final int SELECTIONMODE_MULTI = 2;
-	
-	public static final int ASSIGNEE_ME= 0;
+
+	public static final int ASSIGNEE_ME = 0;
 	public static final int ASSIGNEE_ALL = 1;
 	
 	public static final int VERSIONID_ALL = 0;
@@ -43,14 +42,13 @@ public class ReportsModel extends BaseModel {
 
 	private List<Report> selectedReports = new ArrayList<Report>();
 	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
-//	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
 
 	private int assigneeFilterMode = ASSIGNEE_ALL;
 	private Set<Status> statusFilters = new HashSet<Status>();
-	
-	public ReportsModel(Navigator navigator, VaadinSession session) {
-		super(navigator, session);
+
+	public ReportsModel(Navigator navigator) {
+		super(navigator);
 	}
 
 	public List<Report> getSelectedReports() {
@@ -79,7 +77,7 @@ public class ReportsModel extends BaseModel {
 	public void setUploadedFilesToSave(List<Comment> uploadedFilesToSave) {
 		this.uploadedFilesToSave = uploadedFilesToSave;
 	}
-	
+
 	public List<Project> findProjects() {
 		List<Project> projects = new ArrayList<Project>();
 		projects.addAll(getRepository().findProjects());
@@ -118,6 +116,7 @@ public class ReportsModel extends BaseModel {
 		projectVersions.add(0, allVersion);
 		return projectVersions;
 	}
+
 	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(project));
@@ -128,9 +127,12 @@ public class ReportsModel extends BaseModel {
 	public Collection<Report> findReports(Project project, ProjectVersion version) {
 		ReportsQuery query = new ReportsQuery();
 		query.project = project;
-		if (version.getId() != VERSIONID_ALL)
+		if (version.getId() != VERSIONID_ALL) {
 			query.projectVersion = version;
-		query.reportAssignee = assigneeFilterMode == ASSIGNEE_ME ? getLoginUser() : null;
+		}
+		if (assigneeFilterMode == ASSIGNEE_ME) {
+			query.reportAssignee =  getLoginUser();
+		}
 		query.reportStatuses = statusFilters;
 		return getRepository().findReports(query);
 	}
@@ -190,7 +192,6 @@ public class ReportsModel extends BaseModel {
 		getRepository().save(comment);
 	}
 
-
 	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
@@ -213,7 +214,7 @@ public class ReportsModel extends BaseModel {
 		}
 		uploadedFilesToSave.clear();
 	}
-	
+
 	public ReportDistribution getReportDistribution(ProjectVersion version) {
 		ReportDistribution distribution = new ReportDistribution();
 		boolean isAllVersions = version.getId() == VERSIONID_ALL;
@@ -235,12 +236,12 @@ public class ReportsModel extends BaseModel {
 		return statusFilters;
 	}
 
-	public void setStatusFilters(Status...status) {
+	public void setStatusFilters(Status... status) {
 		statusFilters.clear();
 		statusFilters.addAll(Arrays.asList(status));
 	}
 
-	public void changeStatusFilters(boolean isChecked, Status...status) {
+	public void changeStatusFilters(boolean isChecked, Status... status) {
 		if (isChecked)
 			statusFilters.addAll(Arrays.asList(status));
 		else
