@@ -14779,3 +14779,11 @@ div.v-layout.v-horizontal.v-widget {
 	width: 19px;
 	overflow: hidden;
 }
+
+.mytheme div.bar {
+	background-color: gray;
+	height: 20px;
+	width: 10px;
+	vertical-align: middle;
+	margin-left: 1px;
+}

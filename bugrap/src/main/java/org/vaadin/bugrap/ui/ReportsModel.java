@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.vaadin.bugrap.BaseModel;
 import org.vaadin.bugrap.domain.BugrapRepository.ReportsQuery;
@@ -20,12 +20,12 @@ import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
+import org.vaadin.bugrap.ui.beans.ReportDistribution;
 import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DownloadStream;
-import com.vaadin.ui.ProgressBar;
 
 public class ReportsModel extends BaseModel {
 
@@ -33,12 +33,17 @@ public class ReportsModel extends BaseModel {
 	public static final int SELECTIONMODE_SINGLE = 1;
 	public static final int SELECTIONMODE_MULTI = 2;
 
+	public static final int ASSIGNEE_ME = 0;
+	public static final int ASSIGNEE_ALL = 1;
+
 	public static final String FILEUPLOAD_PATH = "/Users/onuridrisoglu/Downloads/temp/";
 
 	private List<Report> selectedReports = new ArrayList<Report>();
 	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
-//	private Map<String, Object> uploadingUIElements = new HashMap<String, Object>();
 	protected Report reportForEdit;
+
+	private int assigneeFilterMode = ASSIGNEE_ALL;
+	private Set<Status> statusFilters = new HashSet<Status>();
 
 	public ReportsModel(Navigator navigator) {
 		super(navigator);
@@ -70,7 +75,7 @@ public class ReportsModel extends BaseModel {
 	public void setUploadedFilesToSave(List<Comment> uploadedFilesToSave) {
 		this.uploadedFilesToSave = uploadedFilesToSave;
 	}
-	
+
 	public List<Project> findProjects() {
 		List<Project> projects = new ArrayList<Project>();
 		projects.addAll(getRepository().findProjects());
@@ -86,7 +91,7 @@ public class ReportsModel extends BaseModel {
 		return Arrays.asList(Type.values());
 	}
 
-	public Collection<Status> getStatuses() {
+	public Collection<Status> getAllStatuses() {
 		return Arrays.asList(Status.values());
 	}
 
@@ -97,6 +102,7 @@ public class ReportsModel extends BaseModel {
 	public List<ProjectVersion> findProjectVersions() {
 		return findProjectVersions(reportForEdit.getProject());
 	}
+
 	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
 		projectVersions.addAll(getRepository().findProjectVersions(project));
@@ -108,6 +114,8 @@ public class ReportsModel extends BaseModel {
 		ReportsQuery query = new ReportsQuery();
 		query.project = project;
 		query.projectVersion = version;
+		query.reportAssignee = (assigneeFilterMode == ASSIGNEE_ME) ? getLoginUser() : null;
+		query.reportStatuses = statusFilters;
 		return getRepository().findReports(query);
 	}
 
@@ -156,23 +164,22 @@ public class ReportsModel extends BaseModel {
 		reportForEdit = ReportUtil.getCommonFields(selectedReports);
 	}
 
-	public void saveComment(String commentTxt, Reporter author) {
+	public void saveComment(String commentTxt) {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
 		comment.setComment(commentTxt);
-		comment.setAuthor(author);
+		comment.setAuthor(getLoginUser());
 		comment.setTimestamp(new Date());
 		comment.setType(Comment.Type.COMMENT);
 		getRepository().save(comment);
 	}
-
 
 	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
 		comment.setAttachment(stream.getStream().readAllBytes());
 		comment.setAttachmentName(filename);
-		comment.setAuthor(BaseModel.loginUser);
+		comment.setAuthor(getLoginUser());
 		comment.setTimestamp(new Date());
 		comment.setType(Comment.Type.ATTACHMENT);
 		return comment;
@@ -189,5 +196,36 @@ public class ReportsModel extends BaseModel {
 		}
 		uploadedFilesToSave.clear();
 	}
-  
+
+	public ReportDistribution getReportDistribution(ProjectVersion version) {
+		ReportDistribution distribution = new ReportDistribution();
+		distribution.setClosedReports(getRepository().countClosedReports(version));
+		distribution.setAssignedReports(getRepository().countOpenedReports(version));
+		distribution.setUnassignedReports(getRepository().countUnassignedReports(version));
+		return distribution;
+	}
+
+	public int getAssigneeFilterMode() {
+		return assigneeFilterMode;
+	}
+
+	public void setAssigneeFilterMode(int assigneeFilterMode) {
+		this.assigneeFilterMode = assigneeFilterMode;
+	}
+
+	public Set<Status> getStatusFilter() {
+		return statusFilters;
+	}
+
+	public void setStatusFilters(Status... status) {
+		statusFilters.clear();
+		statusFilters.addAll(Arrays.asList(status));
+	}
+
+	public void changeStatusFilters(boolean isChecked, Status... status) {
+		if (isChecked)
+			statusFilters.addAll(Arrays.asList(status));
+		else
+			statusFilters.removeAll(Arrays.asList(status));
+	}
 }

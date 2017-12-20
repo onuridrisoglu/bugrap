@@ -1,0 +1,37 @@
+table.distribution_panel tbody{
+    display: block;
+}
+table.distribution_panel tbody tr{
+    display: block;
+}
+table.distribution_panel tbody tr td{
+    display: inline-block;
+}
+div.report{
+	padding: 5px;
+    padding-left: 12px;
+	min-width: 30px;
+    font-size: small;
+    font-weight: bold;
+}
+div.first {
+	border-bottom-left-radius: 10px;
+	border-top-left-radius: 10px;
+}
+div.last {
+	border-bottom-right-radius: 10px;
+	border-top-right-radius: 10px;
+}
+div.closed {
+	background-color: rgb(80, 80, 80);
+    color: whitesmoke ;
+}
+
+div.assigned {
+	background-color: rgb(120, 120, 120);
+    color: whitesmoke ;
+}
+
+div.unassigned {
+	background-color: rgb(180, 180, 180);
+}
