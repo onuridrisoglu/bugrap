@@ -35,6 +35,8 @@ public class ReportsModel extends BaseModel {
 
 	public static final int ASSIGNEE_ME = 0;
 	public static final int ASSIGNEE_ALL = 1;
+	
+	public static final int VERSIONID_ALL = 0;
 
 	public static final String FILEUPLOAD_PATH = "/Users/onuridrisoglu/Downloads/temp/";
 
@@ -102,6 +104,18 @@ public class ReportsModel extends BaseModel {
 	public List<ProjectVersion> findProjectVersions() {
 		return findProjectVersions(reportForEdit.getProject());
 	}
+	
+	public List<ProjectVersion> findProjectVersionsWithAllOption(Project project) {
+		List<ProjectVersion> projectVersions = findProjectVersions(project);
+		
+		ProjectVersion allVersion = new ProjectVersion();
+		allVersion.setId(VERSIONID_ALL);
+		allVersion.setVersion("All Versions");
+		allVersion.setProject(project);
+		
+		projectVersions.add(0, allVersion);
+		return projectVersions;
+	}
 
 	public List<ProjectVersion> findProjectVersions(Project project) {
 		List<ProjectVersion> projectVersions = new ArrayList<ProjectVersion>();
@@ -113,8 +127,12 @@ public class ReportsModel extends BaseModel {
 	public Collection<Report> findReports(Project project, ProjectVersion version) {
 		ReportsQuery query = new ReportsQuery();
 		query.project = project;
-		query.projectVersion = version;
-		query.reportAssignee = (assigneeFilterMode == ASSIGNEE_ME) ? getLoginUser() : null;
+		if (version.getId() != VERSIONID_ALL) {
+			query.projectVersion = version;
+		}
+		if (assigneeFilterMode == ASSIGNEE_ME) {
+			query.reportAssignee =  getLoginUser();
+		}
 		query.reportStatuses = statusFilters;
 		return getRepository().findReports(query);
 	}
@@ -199,9 +217,10 @@ public class ReportsModel extends BaseModel {
 
 	public ReportDistribution getReportDistribution(ProjectVersion version) {
 		ReportDistribution distribution = new ReportDistribution();
-		distribution.setClosedReports(getRepository().countClosedReports(version));
-		distribution.setAssignedReports(getRepository().countOpenedReports(version));
-		distribution.setUnassignedReports(getRepository().countUnassignedReports(version));
+		boolean isAllVersions = version.getId() == VERSIONID_ALL;
+		distribution.setClosedReports(isAllVersions ? getRepository().countClosedReports(version.getProject()) : getRepository().countClosedReports(version));
+		distribution.setAssignedReports(isAllVersions ? getRepository().countOpenedReports(version.getProject()) : getRepository().countOpenedReports(version));
+		distribution.setUnassignedReports(isAllVersions ? getRepository().countUnassignedReports(version.getProject()) : getRepository().countUnassignedReports(version));
 		return distribution;
 	}
 

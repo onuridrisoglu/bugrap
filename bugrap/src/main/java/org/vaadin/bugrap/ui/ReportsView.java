@@ -20,6 +20,7 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -141,6 +142,7 @@ public class ReportsView extends ReportsViewBase implements View {
 
 	private void initializeGrid() {
 		gridReports.removeAllColumns();
+		gridReports.addColumn("version").setCaption("VERSION");
 		gridReports.addColumn(report -> PriorityColumnRenderer.getHtmlForPriority(report.getPriority()), new HtmlRenderer()).setCaption("PRIORITY").setExpandRatio(1);
 		gridReports.addColumn(report -> StringUtil.converToCamelCaseString(report.getType().toString())).setCaption("TYPE").setExpandRatio(1);
 		gridReports.addColumn("summary").setCaption("SUMMARY").setExpandRatio(5);
@@ -178,13 +180,20 @@ public class ReportsView extends ReportsViewBase implements View {
 	}
 
 	private void processProjectChange() {
-		List<ProjectVersion> versions = model.findProjectVersions(cmbProjectFilter.getValue());
-		cmbVersion.setItems(versions);
-		cmbVersion.setSelectedItem(versions.get(0));
-		cmbEditVersion.setItems(versions);
+		Project selectedProject = cmbProjectFilter.getValue();
+		List<ProjectVersion> versionList = model.findProjectVersionsWithAllOption(selectedProject);
+		cmbVersion.setItems(versionList);
+		
+		ProjectVersion lastSelectedVersion = model.getLastSelectedVersion(selectedProject);
+		cmbVersion.setSelectedItem(lastSelectedVersion != null ? lastSelectedVersion : versionList.get(0) );
+		
+		cmbEditVersion.setItems(model.findProjectVersions(selectedProject)); //This combo should not include the 'ALL' option
 	}
 
 	private void processVersionChange() {
+		ProjectVersion selectedVersion = cmbVersion.getValue();
+		model.setLastSelectedVersion(selectedVersion);
+		gridReports.getColumn("version").setHidden(selectedVersion.getId() != ReportsModel.VERSIONID_ALL);
 		refreshGridContent();
 		refreshDistributionBar();
 	}
