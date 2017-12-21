@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.vaadin.bugrap.BaseModel;
@@ -20,12 +22,15 @@ import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
+import org.vaadin.bugrap.ui.beans.FileUploadEvent;
 import org.vaadin.bugrap.ui.beans.ReportDistribution;
+import org.vaadin.bugrap.util.IUploadedFileListener;
 import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DownloadStream;
+import com.vaadin.ui.Notification;
 
 public class ReportsModel extends BaseModel {
 
@@ -38,10 +43,8 @@ public class ReportsModel extends BaseModel {
 	
 	public static final int VERSIONID_ALL = 0;
 
-	public static final String FILEUPLOAD_PATH = "/Users/onuridrisoglu/Downloads/temp/";
-
 	private List<Report> selectedReports = new ArrayList<Report>();
-	private List<Comment> uploadedFilesToSave = new ArrayList<Comment>();
+	private Map<Object, Comment> uploadedFilesToSave = new HashMap<Object, Comment>();
 	protected Report reportForEdit;
 
 	private int assigneeFilterMode = ASSIGNEE_ALL;
@@ -68,14 +71,6 @@ public class ReportsModel extends BaseModel {
 			return SELECTIONMODE_SINGLE;
 		else
 			return SELECTIONMODE_MULTI;
-	}
-
-	public List<Comment> getUploadedFilesToSave() {
-		return uploadedFilesToSave;
-	}
-
-	public void setUploadedFilesToSave(List<Comment> uploadedFilesToSave) {
-		this.uploadedFilesToSave = uploadedFilesToSave;
 	}
 
 	public List<Project> findProjects() {
@@ -203,16 +198,23 @@ public class ReportsModel extends BaseModel {
 		return comment;
 	}
 
-	public void attachFile(String filename, String mimeType, DownloadStream stream) throws IOException {
+	public void attachFile(Object source, String filename, String mimeType, DownloadStream stream) throws IOException {
 		Comment attachmentComment = createComment(filename, mimeType, stream);
-		uploadedFilesToSave.add(attachmentComment);
+		uploadedFilesToSave.put(source, attachmentComment);
+	}
+	public void removeAttachedFile(Object source) {
+		uploadedFilesToSave.remove(source);
 	}
 
 	public void saveAttachments() {
-		for (Comment attachment : uploadedFilesToSave) {
+		for (Comment attachment : uploadedFilesToSave.values()) {
 			getRepository().save(attachment);
 		}
 		uploadedFilesToSave.clear();
+	}
+	
+	public boolean hasFilesToSave() {
+		return uploadedFilesToSave.size() > 0;
 	}
 
 	public ReportDistribution getReportDistribution(ProjectVersion version) {
@@ -247,4 +249,5 @@ public class ReportsModel extends BaseModel {
 		else
 			statusFilters.removeAll(Arrays.asList(status));
 	}
+	
 }
