@@ -1,39 +1,33 @@
 package org.vaadin.bugrap.ui;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.vaadin.bugrap.domain.entities.Comment;
 import org.vaadin.bugrap.domain.entities.Report;
+import org.vaadin.bugrap.ui.beans.FileUploadEvent;
 import org.vaadin.bugrap.ui.generated.ReportDetailViewBase;
+import org.vaadin.bugrap.util.IUploadedFileListener;
 
 import com.vaadin.data.Binder;
-import com.vaadin.server.FileDownloader;
-import com.vaadin.server.FileResource;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Upload.ProgressListener;
-import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Upload;
+import com.vaadin.ui.Upload.FinishedEvent;
+import com.vaadin.ui.Upload.FinishedListener;
 import com.vaadin.ui.Upload.StartedEvent;
 import com.vaadin.ui.Upload.StartedListener;
-import com.vaadin.ui.Upload.SucceededEvent;
-import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class ReportDetailView extends ReportDetailViewBase
-		implements Receiver, SucceededListener, StartedListener, ProgressListener {
+		implements StartedListener, Component.Listener, IUploadedFileListener, FinishedListener {
 
 	private ReportsModel model;
 	private Binder<Report> binder = new Binder<Report>();
-	private ProgressBar uploadInProgress;
+	private int numOfOngoingUploads = 0;
 
 	public ReportDetailView(ReportsModel reportModel) {
 		model = reportModel;
@@ -55,11 +49,10 @@ public class ReportDetailView extends ReportDetailViewBase
 		btnRevertReport.addClickListener(evt -> revertChanges());
 		btnDone.addClickListener(evt -> saveComment());
 		btnCancel.addClickListener(evt -> closeWindow());
-		btnUpload.setReceiver(this);
 		btnUpload.addStartedListener(this);
-		btnUpload.addSucceededListener(this);
-		btnUpload.addProgressListener(this);
-		txtComment.addValueChangeListener(evt -> commentsUpdated());
+		btnUpload.addFinishedListener(this);
+		txtComment.addValueChangeListener(evt -> setDoneButtonEnablement());
+		pnlAttachments.getContent().addListener(this);
 	}
 
 	private void init() {
@@ -73,7 +66,6 @@ public class ReportDetailView extends ReportDetailViewBase
 
 	private void cleanAttachments() {
 		((HorizontalLayout) pnlAttachments.getContent()).removeAllComponents();
-		pnlAttachments.setVisible(false);
 	}
 
 	private void initializeComboContents() {
@@ -95,8 +87,13 @@ public class ReportDetailView extends ReportDetailViewBase
 		btnDone.setEnabled(false);
 	}
 
-	private void commentsUpdated() {
-		btnDone.setEnabled(true);
+	private void setDoneButtonEnablement() {
+		boolean isEnabled = false;
+		if (numOfOngoingUploads > 0)
+			isEnabled = false;
+		else
+			isEnabled = !txtComment.isEmpty() || model.hasFilesToSave();
+		btnDone.setEnabled(isEnabled);
 	}
 
 	private void saveReport() {
@@ -119,55 +116,61 @@ public class ReportDetailView extends ReportDetailViewBase
 
 	@Override
 	public void uploadStarted(StartedEvent event) {
-		pnlAttachments.setVisible(true);
+		initiateUploadTracker(event);
+		addNewUpload();
+		numOfOngoingUploads++;
+	}
+
+	private void addNewUpload() {
+		HorizontalLayout layout = (HorizontalLayout) btnUpload.getParent();
+		Upload newUpload = new Upload();
+		newUpload.setButtonCaption("Attachments...");
+		newUpload.addStartedListener(this);
+		newUpload.addFinishedListener(this);
+		layout.addComponent(newUpload, layout.getComponentIndex(btnUpload));
+		btnUpload.setStyleName("removed-upload", true);
+		btnUpload = newUpload;
+	}
+
+	private void initiateUploadTracker(StartedEvent event) {
+		UploadTracker uploadTracker = new UploadTracker((Upload) event.getSource(), event.getFilename());
+		uploadTracker.setUploadedFileListener(this);
 		HorizontalLayout layout = (HorizontalLayout) pnlAttachments.getContent();
-		ProgressBar progress = new ProgressBar();
-		progress.setCaption(event.getFilename());
-		uploadInProgress = progress;
-		layout.addComponent(progress);
-		btnDone.setEnabled(false);//disable done button until upload completes
-	}
-
-	@Override
-	public void uploadSucceeded(SucceededEvent event) {
-		HorizontalLayout layout = (HorizontalLayout) pnlAttachments.getContent();
-		layout.removeComponent(uploadInProgress);
-		uploadInProgress = null;
-		FileResource file = new FileResource(new File(ReportsModel.FILEUPLOAD_PATH + event.getFilename()));
-		try {
-			model.attachFile(event.getFilename(), event.getMIMEType(), file.getStream());
-		} catch (IOException e) {
-			Notification.show("Error occurred while uploading the file", e.getMessage(), Type.ERROR_MESSAGE);
-		}
-		FileDownloader downloader = new FileDownloader(file);
-		Link link = new Link();
-		link.setCaption(event.getFilename());
-		link.setStyleName("tiny");
-		downloader.extend(link);
-		layout.addComponent(link);
-		commentsUpdated();
-	}
-
-	@Override
-	public OutputStream receiveUpload(String filename, String mimeType) {
-		FileOutputStream fos = null;
-		try {
-			fos = new FileOutputStream(ReportsModel.FILEUPLOAD_PATH + filename);
-		} catch (FileNotFoundException e) {
-			Notification.show("Error occurred while uploading the file", e.getMessage(), Type.ERROR_MESSAGE);
-		} finally {
-			return fos;
-		}
-	}
-
-	@Override
-	public void updateProgress(long readBytes, long contentLength) {
-		if (uploadInProgress != null)
-			uploadInProgress.setValue(((float) readBytes) / contentLength);
+		layout.addComponent(uploadTracker);
 	}
 
 	private void closeWindow() {
 		Window window = (Window) getParent();
 		window.close();
+	}
+
+	@Override
+	public void componentEvent(Event event) {
+		HorizontalLayout layout = (HorizontalLayout) event.getSource();
+		pnlAttachments.setVisible(layout.getComponentCount() > 0);
+	}
+
+	@Override
+	public void uploadedFileReceived(FileUploadEvent event) {
+		try {
+			model.attachFile(event.getSource(), event.getFilename(), event.getFilename(), event.getStream());
+			setDoneButtonEnablement();
+		} catch (IOException e) {
+			Notification.show("Error uploading file : " + event.getFilename(),
+					"There was an error while uploading the file :" + e.getMessage(),
+					com.vaadin.ui.Notification.Type.ERROR_MESSAGE);
+		}
+	}
+
+	@Override
+	public void uploadFinished(FinishedEvent event) {
+		numOfOngoingUploads--;
+		setDoneButtonEnablement();
+	}
+
+	@Override
+	public void uploadedFileDeleted(Object source) {
+		model.removeAttachedFile(source);
+		setDoneButtonEnablement();
 	}
 }
