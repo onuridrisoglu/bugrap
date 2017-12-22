@@ -1,6 +1,7 @@
 package org.vaadin.bugrap.ui;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,15 +23,11 @@ import org.vaadin.bugrap.domain.entities.Report.Priority;
 import org.vaadin.bugrap.domain.entities.Report.Status;
 import org.vaadin.bugrap.domain.entities.Report.Type;
 import org.vaadin.bugrap.domain.entities.Reporter;
-import org.vaadin.bugrap.ui.beans.FileUploadEvent;
 import org.vaadin.bugrap.ui.beans.ReportDistribution;
-import org.vaadin.bugrap.util.IUploadedFileListener;
 import org.vaadin.bugrap.util.ReportUtil;
 
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.Navigator;
-import com.vaadin.server.DownloadStream;
-import com.vaadin.ui.Notification;
 
 public class ReportsModel extends BaseModel {
 
@@ -40,7 +37,7 @@ public class ReportsModel extends BaseModel {
 
 	public static final int ASSIGNEE_ME = 0;
 	public static final int ASSIGNEE_ALL = 1;
-	
+
 	public static final int VERSIONID_ALL = 0;
 
 	private List<Report> selectedReports = new ArrayList<Report>();
@@ -99,15 +96,15 @@ public class ReportsModel extends BaseModel {
 	public List<ProjectVersion> findProjectVersions() {
 		return findProjectVersions(reportForEdit.getProject());
 	}
-	
+
 	public List<ProjectVersion> findProjectVersionsWithAllOption(Project project) {
 		List<ProjectVersion> projectVersions = findProjectVersions(project);
-		
+
 		ProjectVersion allVersion = new ProjectVersion();
 		allVersion.setId(VERSIONID_ALL);
 		allVersion.setVersion("All Versions");
 		allVersion.setProject(project);
-		
+
 		projectVersions.add(0, allVersion);
 		return projectVersions;
 	}
@@ -126,7 +123,7 @@ public class ReportsModel extends BaseModel {
 			query.projectVersion = version;
 		}
 		if (assigneeFilterMode == ASSIGNEE_ME) {
-			query.reportAssignee =  getLoginUser();
+			query.reportAssignee = getLoginUser();
 		}
 		query.reportStatuses = statusFilters;
 		return getRepository().findReports(query);
@@ -187,10 +184,10 @@ public class ReportsModel extends BaseModel {
 		getRepository().save(comment);
 	}
 
-	public Comment createComment(String filename, String mimeType, DownloadStream stream) throws IOException {
+	public Comment createComment(String filename, String mimeType, InputStream stream) throws IOException {
 		Comment comment = new Comment();
 		comment.setReport(reportForEdit);
-		comment.setAttachment(stream.getStream().readAllBytes());
+		comment.setAttachment(stream.readAllBytes());
 		comment.setAttachmentName(filename);
 		comment.setAuthor(getLoginUser());
 		comment.setTimestamp(new Date());
@@ -198,10 +195,11 @@ public class ReportsModel extends BaseModel {
 		return comment;
 	}
 
-	public void attachFile(Object source, String filename, String mimeType, DownloadStream stream) throws IOException {
+	public void attachFile(Object source, String filename, String mimeType, InputStream stream) throws IOException {
 		Comment attachmentComment = createComment(filename, mimeType, stream);
 		uploadedFilesToSave.put(source, attachmentComment);
 	}
+
 	public void removeAttachedFile(Object source) {
 		uploadedFilesToSave.remove(source);
 	}
@@ -212,7 +210,7 @@ public class ReportsModel extends BaseModel {
 		}
 		uploadedFilesToSave.clear();
 	}
-	
+
 	public boolean hasFilesToSave() {
 		return uploadedFilesToSave.size() > 0;
 	}
@@ -220,9 +218,12 @@ public class ReportsModel extends BaseModel {
 	public ReportDistribution getReportDistribution(ProjectVersion version) {
 		ReportDistribution distribution = new ReportDistribution();
 		boolean isAllVersions = version.getId() == VERSIONID_ALL;
-		distribution.setClosedReports(isAllVersions ? getRepository().countClosedReports(version.getProject()) : getRepository().countClosedReports(version));
-		distribution.setAssignedReports(isAllVersions ? getRepository().countOpenedReports(version.getProject()) : getRepository().countOpenedReports(version));
-		distribution.setUnassignedReports(isAllVersions ? getRepository().countUnassignedReports(version.getProject()) : getRepository().countUnassignedReports(version));
+		distribution.setClosedReports(isAllVersions ? getRepository().countClosedReports(version.getProject())
+				: getRepository().countClosedReports(version));
+		distribution.setAssignedReports(isAllVersions ? getRepository().countOpenedReports(version.getProject())
+				: getRepository().countOpenedReports(version));
+		distribution.setUnassignedReports(isAllVersions ? getRepository().countUnassignedReports(version.getProject())
+				: getRepository().countUnassignedReports(version));
 		return distribution;
 	}
 
@@ -249,5 +250,5 @@ public class ReportsModel extends BaseModel {
 		else
 			statusFilters.removeAll(Arrays.asList(status));
 	}
-	
+
 }

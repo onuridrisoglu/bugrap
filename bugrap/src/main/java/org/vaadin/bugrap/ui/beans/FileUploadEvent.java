@@ -1,20 +1,19 @@
 package org.vaadin.bugrap.ui.beans;
 
-import com.vaadin.server.DownloadStream;
-import com.vaadin.ui.Upload;
+import java.io.InputStream;
 
 public class FileUploadEvent {
-	
+
 	private String filename;
 	private String mimeType;
-	private DownloadStream downloadStream;
 	private Object source;
-	
-	public FileUploadEvent(Object source, String filename, String mimeType, DownloadStream downloadStream) {
+	private InputStream stream;
+
+	public FileUploadEvent(Object source, String filename, String mimeType, InputStream stream) {
 		this.filename = filename;
 		this.mimeType = mimeType;
-		this.downloadStream = downloadStream;
-		this.setSource(source);
+		this.source = source;
+		this.stream = stream;
 	}
 
 	public String getFilename() {
@@ -33,19 +32,19 @@ public class FileUploadEvent {
 		this.mimeType = mimeType;
 	}
 
-	public DownloadStream getDownloadStream() {
-		return downloadStream;
-	}
-
-	public void setDownloadStream(DownloadStream downloadStream) {
-		this.downloadStream = downloadStream;
-	}
-
 	public Object getSource() {
 		return source;
 	}
 
 	public void setSource(Object source) {
 		this.source = source;
+	}
+
+	public InputStream getStream() {
+		return stream;
+	}
+
+	public void setStream(InputStream stream) {
+		this.stream = stream;
 	}
 }

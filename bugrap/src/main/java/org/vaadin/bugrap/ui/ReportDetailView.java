@@ -91,7 +91,7 @@ public class ReportDetailView extends ReportDetailViewBase
 		boolean isEnabled = false;
 		if (numOfOngoingUploads > 0)
 			isEnabled = false;
-		else 
+		else
 			isEnabled = !txtComment.isEmpty() || model.hasFilesToSave();
 		btnDone.setEnabled(isEnabled);
 	}
@@ -153,7 +153,7 @@ public class ReportDetailView extends ReportDetailViewBase
 	@Override
 	public void uploadedFileReceived(FileUploadEvent event) {
 		try {
-			model.attachFile(event.getSource(), event.getFilename(), event.getFilename(), event.getDownloadStream());
+			model.attachFile(event.getSource(), event.getFilename(), event.getFilename(), event.getStream());
 			setDoneButtonEnablement();
 		} catch (IOException e) {
 			Notification.show("Error uploading file : " + event.getFilename(),

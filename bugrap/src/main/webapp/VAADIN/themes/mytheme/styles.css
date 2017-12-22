@@ -14785,6 +14785,7 @@ div.v-layout.v-horizontal.v-widget {
 	height: 20px;
 	width: 10px;
 	vertical-align: center;
+	margin-right: 2px;
 }
 
 .mytheme div.v-slot-removed-upload {
